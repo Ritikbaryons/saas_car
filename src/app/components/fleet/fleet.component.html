@@ -1,0 +1,186 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Fleet & Operators Operations Center</h2>
+      <p class="text-secondary m-0">Onboard active corporate vehicles, register drivers, and configure active service shifts</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Vehicle Management Form -->
+    <div class="col-md-6">
+      <div class="glass-card h-100 border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-plus-circle text-primary me-2"></i>Add Vehicle to Fleet Inventory</h4>
+        <div *ngIf="carError" class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger py-2 small mb-3">{{ carError }}</div>
+        
+        <form (ngSubmit)="createCar()">
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Manufacturer / Make</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="e.g. Toyota" name="make" [(ngModel)]="newCar.make" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Model</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="e.g. Camry" name="model" [(ngModel)]="newCar.model" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Year</label>
+              <input type="number" class="form-control  border-secondary text-dark" name="year" [(ngModel)]="newCar.year" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Plate License Number</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="e.g. TX-992-K" name="plate" [(ngModel)]="newCar.plateNumber" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-4">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Exterior Color</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="Silver" name="color" [(ngModel)]="newCar.color" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Insurance Expiry Date</label>
+              <input type="date" class="form-control  border-secondary text-dark" name="ins" [(ngModel)]="newCar.insuranceExpiry" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-4">
+            <div class="col-md-12">
+              <label class="form-label text-secondary small fw-bold">Base Fare Rate ($)</label>
+              <input type="number" class="form-control  border-secondary text-dark fw-bold text-success" name="baseRate" [(ngModel)]="newCar.baseRate" required min="0">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary bg-gradient w-100 py-2.5 fw-bold">
+            <i class="bi bi-save me-2"></i>Add Vehicle
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Driver Management Form -->
+    <div class="col-md-6">
+      <div class="glass-card h-100 border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-person-plus text-success me-2"></i>Onboard Driver Operator</h4>
+        <div *ngIf="driverError" class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger py-2 small mb-3">{{ driverError }}</div>
+
+        <form (ngSubmit)="createDriver()">
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">First Name</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="John" name="df" [(ngModel)]="newDriver.firstName" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Last Name</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="Doe" name="dl" [(ngModel)]="newDriver.lastName" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Email</label>
+              <input type="email" class="form-control  border-secondary text-dark" placeholder="driver@acme.com" name="de" [(ngModel)]="newDriver.email" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Phone</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="+1 (555) 019-2831" name="dp" [(ngModel)]="newDriver.phone" required>
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">License Number</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="DL-109283-A" name="dlic" [(ngModel)]="newDriver.licenseNumber" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">License Expiry Date</label>
+              <input type="date" class="form-control  border-secondary text-dark" name="dlicex" [(ngModel)]="newDriver.licenseExpiry" required>
+            </div>
+          </div>
+          <div class="mb-4 form-check mt-3">
+            <input class="form-check-input  border-secondary" type="checkbox" id="createLogin" name="createLogin" [(ngModel)]="newDriver.createLogin">
+            <label class="form-check-label text-secondary small" for="createLogin">
+              Auto-generate login user account and send credentials to driver portal
+            </label>
+          </div>
+          <button type="submit" class="btn btn-success bg-gradient w-100 py-2.5 fw-bold">
+            <i class="bi bi-person-check-fill me-2"></i>Onboard Driver
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Own Vehicles Inventory Table -->
+  <div class="glass-card mb-4 border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">Own Fleet Inventory</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Vehicle Description</th>
+            <th>Plate License</th>
+            <th>Color</th>
+            <th>Status</th>
+            <th>Insurance Expiry</th>
+            <th>Base Rate</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of cars">
+            <td class="fw-bold text-dark">{{ c.make }} {{ c.model }} ({{ c.year }})</td>
+            <td><span class="badge bg-secondary font-monospace">{{ c.plateNumber }}</span></td>
+            <td>{{ c.color }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="c.status === 'Available'" [class.bg-warning]="c.status === 'OnRide'">{{ c.status }}</span>
+            </td>
+            <td>{{ c.insuranceExpiry | date:'yyyy-MM-dd' }}</td>
+            <td class="text-success fw-bold">${{ c.baseRate }}</td>
+            <td class="text-end">
+              <button (click)="deleteCar(c.id)" class="btn btn-outline-danger btn-sm" title="Remove vehicle"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+          <tr *ngIf="cars.length === 0">
+            <td colspan="7" class="text-center text-secondary py-3">No fleet vehicles in active inventory. Add one above.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Operators Directory Table -->
+  <div class="glass-card border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">Active Driver Operators Directory</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>License Number</th>
+            <th>License Expiry</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of drivers">
+            <td class="fw-bold text-dark">{{ d.firstName }} {{ d.lastName }}</td>
+            <td>{{ d.email }}</td>
+            <td>{{ d.phone }}</td>
+            <td>{{ d.licenseNumber }}</td>
+            <td>{{ d.licenseExpiry | date:'yyyy-MM-dd' }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="d.status === 'Available'" [class.bg-warning]="d.status === 'Active'">{{ d.status }}</span>
+            </td>
+            <td class="text-end">
+              <button (click)="deleteDriver(d.id)" class="btn btn-outline-danger btn-sm" title="Remove driver"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+          <tr *ngIf="drivers.length === 0">
+            <td colspan="7" class="text-center text-secondary py-3">No drivers registered. Add an operator above.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,161 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Staff Enlistment & Security Roles</h2>
+      <p class="text-secondary m-0">Provision staff user logins, assign security scopes, and toggle permission policies</p>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-success border-0 bg-success bg-opacity-10 text-success py-3 mb-4">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+  </div>
+
+  <div *ngIf="errorMsg" class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger py-3 mb-4">
+    <i class="bi bi-exclamation-octagon-fill me-2"></i>{{ errorMsg }}
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- User Creation Panel -->
+    <div class="col-md-5">
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Create Staff Member Account</h4>
+        <form (ngSubmit)="createUser()">
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">First Name</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="Jane" name="uf" [(ngModel)]="newUser.firstName" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Last Name</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="Smith" name="ul" [(ngModel)]="newUser.lastName" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Email Address</label>
+            <input type="email" class="form-control  border-secondary text-dark" placeholder="jane.smith@acme.com" name="ue" [(ngModel)]="newUser.email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Temporary Password</label>
+            <input type="password" class="form-control  border-secondary text-dark" placeholder="••••••••" name="up" [(ngModel)]="newUser.password" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold">Select Security Role</label>
+            <select class="form-select  border-secondary text-dark" name="ur" [(ngModel)]="newUser.roleId" required>
+              <option *ngFor="let r of roles" [value]="r.id">{{ r.name }} ({{ r.code }})</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary bg-gradient w-100 py-2.5 fw-bold">
+            <i class="bi bi-save me-2"></i>Create Staff User
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Role Customizer / Creators -->
+    <div class="col-md-7">
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-shield-check text-success me-2"></i>Custom Security Role Builder</h4>
+        
+        <form (ngSubmit)="createRole()">
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Role Name</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="e.g. Operations Assistant" name="rn" [(ngModel)]="newRole.name" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Role Short Code</label>
+              <input type="text" class="form-control  border-secondary text-dark" placeholder="e.g. OPS_ASST" name="rc" [(ngModel)]="newRole.code" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Short Description</label>
+            <input type="text" class="form-control  border-secondary text-dark" placeholder="Limited operations permissions for bookings" name="rd" [(ngModel)]="newRole.description" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold d-block">Select Allowed Permission Code Rights</label>
+            <div class="d-flex flex-wrap gap-2" style="max-height: 120px; overflow-y: auto;">
+              <div class="form-check me-3" *ngFor="let perm of permissions">
+                <input class="form-check-input  border-secondary" type="checkbox" [id]="'perm-' + perm.code" (change)="toggleRolePermission(perm.code)">
+                <label class="form-check-label text-secondary small" [for]="'perm-' + perm.code">
+                  {{ perm.name }} ({{ perm.code }})
+                </label>
+              </div>
+              <div *ngIf="permissions.length === 0" class="text-secondary small">Loading system permissions...</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success bg-gradient px-4 py-2 fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>Save Custom Role
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Directory List Table -->
+  <div class="glass-card mb-4 border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">Active Corporate Users Directory</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email Login</th>
+            <th>Assigned Security Role</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td class="fw-bold text-dark">{{ u.firstName }} {{ u.lastName }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="badge bg-secondary text-dark">{{ u.roleName }}</span>
+            </td>
+            <td>
+              <span class="badge bg-success" *ngIf="u.isActive">Active</span>
+              <span class="badge bg-secondary" *ngIf="!u.isActive">Suspended</span>
+            </td>
+            <td class="text-end">
+              <button (click)="deleteUser(u.id)" class="btn btn-outline-danger btn-sm" title="Revoke Login Access"><i class="bi bi-person-x"></i></button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="text-center text-secondary py-3">No corporate staff user accounts found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Roles Directory List Table -->
+  <div class="glass-card border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">Available Corporate Security Roles</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Role Name</th>
+            <th>Short Code</th>
+            <th>Description Scope</th>
+            <th>Linked Modules Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of roles">
+            <td class="fw-bold text-dark">{{ r.name }}</td>
+            <td><span class="badge bg-secondary font-monospace">{{ r.code }}</span></td>
+            <td class="text-secondary small">{{ r.description }}</td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                <span class="badge bg-info text-dark px-2 py-0.5" style="font-size: 0.75rem;" *ngFor="let perm of r.permissions">{{ perm }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

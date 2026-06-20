@@ -1,0 +1,199 @@
+<div class="animate-fade-in" *ngIf="currentUser">
+  
+  <!-- Super Admin Dashboard -->
+  <div *ngIf="currentUser.role === 'SUPER_ADMIN'">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold m-0">System Control Center</h2>
+        <p class="text-secondary m-0">Aggregated statistics across all active tenants and nodes</p>
+      </div>
+      <button (click)="loadDashboard()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-primary">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Active Tenants</span>
+              <h2 class="fw-extrabold m-0 text-dark mt-1">{{ dashboardData?.activeTenants || 0 }} / {{ dashboardData?.totalTenants || 0 }}</h2>
+            </div>
+            <div class="bg-primary bg-opacity-10 p-3 rounded"><i class="bi bi-building text-primary fs-2"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-success">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">SaaS Monthly Revenue</span>
+              <h2 class="fw-extrabold m-0 text-success mt-1">${{ (dashboardData?.monthlyRevenue || 0) | number:'1.2-2' }}</h2>
+            </div>
+            <div class="bg-success bg-opacity-10 p-3 rounded"><i class="bi bi-cash-coin text-success fs-2"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-info">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Total Plan Options</span>
+              <h2 class="fw-extrabold m-0 text-info mt-1">{{ dashboardData?.totalPlans || 0 }} Plans</h2>
+            </div>
+            <div class="bg-info bg-opacity-10 p-3 rounded"><i class="bi bi-grid-3x3-gap text-info fs-2"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-warning">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Platform Status</span>
+              <h2 class="fw-extrabold m-0 text-warning mt-1">Healthy</h2>
+            </div>
+            <div class="bg-warning bg-opacity-10 p-3 rounded"><i class="bi bi-heart-pulse text-warning fs-2"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <h5 class="fw-bold mb-3"><i class="bi bi-activity text-primary me-2"></i>Platform Logs & Audit Status</h5>
+      <div class="alert alert-info py-3 border-0 bg-info bg-opacity-10 text-info m-0">
+        <i class="bi bi-info-circle-fill me-2"></i>All tenant spaces are active. Background job handlers are operating normally.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tenant / Company Dashboard -->
+  <div *ngIf="currentUser.role !== 'SUPER_ADMIN'">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold m-0">Fleet Executive Control</h2>
+        <p class="text-secondary m-0">Real-time indicators for your company's vehicles, staff, and bookings</p>
+      </div>
+      <button (click)="loadDashboard()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-primary">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Vehicles in Inventory</span>
+              <h2 class="fw-extrabold m-0 mt-1">{{ dashboardData?.totalCars || 0 }}</h2>
+            </div>
+            <div class="bg-primary bg-opacity-10 p-3 rounded"><i class="bi bi-truck text-primary fs-2"></i></div>
+          </div>
+          <div class="progress mt-3 " style="height: 4px;">
+            <div class="progress-bar bg-success" [style.width.%]="(dashboardData?.availableCars / (dashboardData?.totalCars || 1)) * 100"></div>
+          </div>
+          <div class="d-flex justify-content-between small text-secondary mt-2">
+            <span>Available: {{ dashboardData?.availableCars || 0 }}</span>
+            <span>On Trip: {{ dashboardData?.carsOnRide || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-success">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Drivers Enrolled</span>
+              <h2 class="fw-extrabold m-0 mt-1">{{ dashboardData?.totalDrivers || 0 }}</h2>
+            </div>
+            <div class="bg-success bg-opacity-10 p-3 rounded"><i class="bi bi-people text-success fs-2"></i></div>
+          </div>
+          <div class="progress mt-3 " style="height: 4px;">
+            <div class="progress-bar bg-success" [style.width.%]="(dashboardData?.availableDrivers / (dashboardData?.totalDrivers || 1)) * 100"></div>
+          </div>
+          <div class="d-flex justify-content-between small text-secondary mt-2">
+            <span>Available: {{ dashboardData?.availableDrivers || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-warning">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Settled Booking Fares</span>
+              <h2 class="fw-extrabold m-0 text-success mt-1">${{ (dashboardData?.revenue || 0) | number:'1.2-2' }}</h2>
+            </div>
+            <div class="bg-warning bg-opacity-10 p-3 rounded"><i class="bi bi-cash-coin text-warning fs-2"></i></div>
+          </div>
+          <div class="small text-success mt-3"><i class="bi bi-check-circle-fill me-1"></i>Accrued from booking invoices</div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-card hover-glow border-danger">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-secondary small fw-bold">Pending Vendor Dues</span>
+              <h2 class="fw-extrabold m-0 text-danger mt-1">${{ (dashboardData?.pendingVendorPayments || 0) | number:'1.2-2' }}</h2>
+            </div>
+            <div class="bg-danger bg-opacity-10 p-3 rounded"><i class="bi bi-wallet2 text-danger fs-2"></i></div>
+          </div>
+          <div class="small text-secondary mt-3">Shortfall partner settlements</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="glass-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold m-0"><i class="bi bi-map text-primary me-2"></i>Active Journeys & Dispatches</h5>
+            <span class="badge bg-success px-3 py-1 fs-7" *ngIf="activeBookings.length > 0">{{ activeBookings.length }} Active</span>
+          </div>
+
+          <div *ngIf="activeBookings.length === 0" class="alert alert-secondary py-4 text-center border-0  text-secondary m-0">
+            <i class="bi bi-geo-alt fs-3 d-block mb-2"></i>
+            No dispatches or trips are currently active.
+          </div>
+          
+          <div *ngIf="activeBookings.length > 0" class="table-responsive">
+            <table class="table table-hover table-hover table-sm align-middle m-0" style="font-size: 0.85rem;">
+              <thead class="text-secondary">
+                <tr>
+                  <th>Ref #</th>
+                  <th>Customer</th>
+                  <th>Time Window</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of activeBookings">
+                  <td class="fw-bold text-dark">#{{ b.id }}</td>
+                  <td>{{ b.customerName }}</td>
+                  <td class="text-secondary">{{ b.scheduledStart | date:'short' }}</td>
+                  <td>
+                    <span class="badge" [class.bg-warning]="b.status === 'Assigned'" [class.bg-info]="b.status === 'InProgress'">
+                      {{ b.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="glass-card h-100">
+          <h5 class="fw-bold mb-3"><i class="bi bi-share text-info me-2"></i>C2C Shareboard Node Overview</h5>
+          <div class="d-flex justify-content-between border-bottom border-secondary pb-3 mb-3">
+            <span class="text-secondary">Open marketplace demand:</span>
+            <span class="badge bg-info text-dark px-2.5 py-1.5 fw-bold">{{ dashboardData?.marketplaceTransactions || 0 }} transactions</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-secondary">Active shared dispatches:</span>
+            <span class="badge bg-secondary px-2.5 py-1.5 fw-bold">C2C Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

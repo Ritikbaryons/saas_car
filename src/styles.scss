@@ -1,0 +1,177 @@
+/* Global style overrides with Premium HSL design system */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+  --primary-color: #6e2c22;
+  --primary-dark: #501f18;
+  --secondary-color: #aa8136;
+  --dark-bg: #fbf6f0;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --text-primary: #2d2d2d;
+  --text-secondary: #5a5a5a;
+  --border-color: rgba(110, 44, 34, 0.15);
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(170, 129, 54, 0.1) 0px, transparent 50%),
+    radial-gradient(at 90% 90%, rgba(110, 44, 34, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Classes */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
+}
+
+/* Form Styling */
+.form-control, .form-select {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(110, 44, 34, 0.15);
+  color: var(--text-primary);
+}
+
+/* Buttons Styling */
+.btn-primary {
+  background: var(--primary-color);
+  border: none;
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(110, 44, 34, 0.3);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(110, 44, 34, 0.05);
+  color: var(--primary-dark);
+}
+
+/* Navigation items */
+.nav-link {
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary);
+}
+
+/* Modal styling */
+.modal-content {
+  background-color: var(--dark-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 16px;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+}
+
+/* Micro-animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.active-link {
+  background-color: rgba(110, 44, 34, 0.08) !important;
+  color: var(--primary-color) !important;
+  border-left: 3.5px solid var(--primary-color);
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.hr-theme {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.hr-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.hr-text {
+  padding: 0 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+

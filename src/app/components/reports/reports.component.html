@@ -1,0 +1,106 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Corporate Analytics & Reports Center</h2>
+      <p class="text-secondary m-0">Export system journals, trip manifests, partner settlements, and financial ledgers to Excel format</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Booking Reports Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-primary bg-opacity-10 p-2.5 rounded text-primary"><i class="bi bi-calendar-event fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Booking Manifest Journal</h5>
+          </div>
+          <p class="text-secondary small">Contains all booking schedules, associated customer info, trip statuses, and scheduled start/end dates.</p>
+        </div>
+        <button (click)="downloadReport('bookings')" [disabled]="isDownloading" class="btn btn-outline-primary w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Bookings Data (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Financial Revenue Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-success bg-opacity-10 p-2.5 rounded text-success"><i class="bi bi-currency-dollar fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Revenue & Invoice Audit</h5>
+          </div>
+          <p class="text-secondary small">Export total invoice fares, payment transaction references, date filters, and aggregated revenue statements.</p>
+        </div>
+        <button (click)="downloadReport('revenue')" [disabled]="isDownloading" class="btn btn-outline-success w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Revenue Data (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Fleet Inventory Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-info bg-opacity-10 p-2.5 rounded text-info"><i class="bi bi-truck fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Fleet Assets Log</h5>
+          </div>
+          <p class="text-secondary small">Lists all registered corporate vehicles, active statuses, colors, manufacturer makes, and insurance details.</p>
+        </div>
+        <button (click)="downloadReport('fleet')" [disabled]="isDownloading" class="btn btn-outline-info w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Fleet Inventory (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Driver Roster Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-warning bg-opacity-10 p-2.5 rounded text-warning"><i class="bi bi-people fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Driver Payroll Roster</h5>
+          </div>
+          <p class="text-secondary small">Comprehensive details on staff driver operators, contact info, license details, and license expiration timelines.</p>
+        </div>
+        <button (click)="downloadReport('drivers')" [disabled]="isDownloading" class="btn btn-outline-warning w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Operators List (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Vendor Ledger Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-danger bg-opacity-10 p-2.5 rounded text-danger"><i class="bi bi-wallet2 fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Partner Vendor Settlements</h5>
+          </div>
+          <p class="text-secondary small">Accrual logs for shortfall partner bookings, pending balances, reference numbers, and payment notes.</p>
+        </div>
+        <button (click)="downloadReport('vendors')" [disabled]="isDownloading" class="btn btn-outline-danger w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Vendor Ledgers (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Marketplace Audits Card -->
+    <div class="col-md-4">
+      <div class="glass-card hover-glow h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-secondary bg-opacity-10 p-2.5 rounded text-secondary"><i class="bi bi-shop fs-3"></i></div>
+            <h5 class="fw-bold text-dark mb-0">C2C Sharing Logins</h5>
+          </div>
+          <p class="text-secondary small">Export ledger details of peer tenant company-to-company transactions, shared vehicles, and debit/credit flows.</p>
+        </div>
+        <button (click)="downloadReport('marketplace')" [disabled]="isDownloading" class="btn btn-outline-secondary w-100 mt-4 bg-gradient">
+          <i class="bi bi-download me-2"></i>Export Marketplace Logs (.xlsx)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

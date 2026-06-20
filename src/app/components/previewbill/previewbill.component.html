@@ -1,0 +1,106 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0"><i class="bi bi-receipt text-primary me-2"></i>Invoice Details</h2>
+      <p class="text-secondary m-0">Corporate journey billing for {{ selectedBill?.customerName }}</p>
+    </div>
+    <button (click)="onClose()" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+      <i class="bi bi-arrow-left"></i>Back to Bookings
+    </button>
+  </div>
+
+  <div class="glass-card border border-primary p-4">
+    <div class="row border-bottom border-secondary pb-4 mb-4">
+      <div class="col-md-6">
+        <h4 class="text-dark fw-bold">FleetFlow SaaS Portal</h4>
+        <p class="text-secondary mb-0">Invoice #INV-{{ selectedBill?.id }}</p>
+        <p class="text-secondary">Date: {{ selectedBill?.scheduledEnd | date:'longDate' }}</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <h5 class="text-dark">Billed To:</h5>
+        <p class="text-dark fw-bold mb-0">{{ selectedBill?.customerName }}</p>
+        <p class="text-secondary mb-0">Booking ID: {{ selectedBill?.id }}</p>
+        <p class="text-secondary small mb-2">
+          <strong>Pickup:</strong> {{ selectedBill?.pickupLocation || 'N/A' }} <br>
+          <strong>Drop:</strong> {{ selectedBill?.dropLocation || 'N/A' }}
+        </p>
+        <span class="badge" [class.bg-success]="selectedBill?.status === 'Completed'" [class.bg-warning]="selectedBill?.status !== 'Completed'">
+          {{ selectedBill?.status }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Booking Summary -->
+    <div class="table-responsive mb-4">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Schedule</th>
+            <th class="text-end">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Corporate Multi-Vehicle Journey</td>
+            <td>{{ selectedBill?.scheduledStart | date:'medium' }} to {{ selectedBill?.scheduledEnd | date:'medium' }}</td>
+            <td class="text-end fw-bold text-success">${{ selectedBill?.totalAmount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vehicle Details Section -->
+    <div class="mb-4" *ngIf="selectedBill?.bookingVehicles?.length > 0">
+      <h5 class="text-dark mb-3">Assigned Vehicle Details</h5>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm table-bordered border-secondary align-middle">
+          <thead class="table-active">
+            <tr>
+              <th>Vehicle Name</th>
+              <th>Assignment</th>
+              <th>Qty</th>
+              <th>Rate Type</th>
+              <th>Base Rate</th>
+              <th>Dist/Hrs</th>
+              <th class="text-end">Fare</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vehicle of selectedBill?.bookingVehicles">
+              <td>{{ vehicle.carName || vehicle.partnerVehicleName || 'N/A' }}</td>
+              <td><span class="badge bg-secondary">{{ vehicle.assignmentType }}</span></td>
+              <td>{{ vehicle.quantity || 1 }}</td>
+              <td>{{ vehicle.rateType || 'Fixed' }}</td>
+              <td>${{ (vehicle.baseRate || 0) | number:'1.2-2' }}</td>
+              <td>{{ vehicle.rateType === 'PerKM' ? (vehicle.distance || 0) + ' km' : vehicle.rateType === 'Hourly' ? (vehicle.hours || 0) + ' hrs' : '-' }}</td>
+              <td class="text-end text-success fw-bold">${{ (vehicle.fare || 0) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <div class="text-end" style="width: 300px;">
+        <div class="d-flex justify-content-between text-secondary mb-2">
+          <span>Subtotal:</span>
+          <span>${{ selectedBill?.totalAmount }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-secondary mb-2 border-bottom border-secondary pb-2">
+          <span>Tax (15%):</span>
+          <span>${{ (selectedBill?.totalAmount * 0.15) | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-dark fs-5 fw-bold mt-2">
+          <span>Total Due:</span>
+          <span class="text-success">${{ selectedBill?.totalAmount | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-3 border-top border-secondary text-center">
+      <p class="text-secondary small mb-3">Thank you for your business. For any questions regarding this invoice, please contact support.</p>
+      <button class="btn btn-primary bg-gradient me-2" onclick="window.print()"><i class="bi bi-printer me-2"></i>Print Invoice</button>
+    </div>
+  </div>
+</div>

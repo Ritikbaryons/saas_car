@@ -1,0 +1,58 @@
+<div class="container animate-fade-in" style="max-width: 500px;">
+  <div class="glass-card text-dark shadow-lg p-5 rounded-4 border border-secondary">
+    
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-gradient p-3 rounded-circle mb-3 shadow">
+        <i class="bi bi-rocket-takeoff text-dark fs-2"></i>
+      </div>
+      <h2 class="fw-bold tracking-tight">FleetFlow Portal</h2>
+      <p class="text-secondary small">Enter your SaaS credentials to manage your fleet</p>
+    </div>
+
+    <div *ngIf="loginError" class="alert alert-danger border-0 bg-danger bg-white bg-opacity-50 text-danger small py-2.5 mb-4 animate-shake">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ loginError }}
+    </div>
+
+    <form (ngSubmit)="onLogin()">
+      <div class="mb-3">
+        <label class="form-label text-secondary small fw-bold">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text  border-secondary text-secondary"><i class="bi bi-envelope"></i></span>
+          <input type="email" class="form-control  border-secondary text-dark" name="email" [(ngModel)]="loginData.email" required placeholder="name@company.com">
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="form-label text-secondary small fw-bold">Password</label>
+        <div class="input-group">
+          <span class="input-group-text  border-secondary text-secondary"><i class="bi bi-lock"></i></span>
+          <input type="password" class="form-control  border-secondary text-dark" name="password" [(ngModel)]="loginData.password" required placeholder="••••••••">
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold bg-gradient shadow-sm mb-3">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+      </button>
+    </form>
+
+    <div class="hr-theme mb-4">
+      <span class="hr-line"></span>
+      <span class="hr-text text-secondary small">QUICK DEMO LOGINS</span>
+      <span class="hr-line"></span>
+    </div>
+
+    <div class="row g-2">
+      <div class="col">
+        <button type="button" (click)="quickLogin('tenant')" class="btn btn-outline-info w-100 py-2 btn-sm text-truncate fw-semibold">
+          <i class="bi bi-building me-1"></i>Tenant Owner
+        </button>
+      </div>
+      <div class="col">
+        <button type="button" (click)="quickLogin('admin')" class="btn btn-outline-warning w-100 py-2 btn-sm text-truncate fw-semibold">
+          <i class="bi bi-shield-shaded me-1"></i>Super Admin
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,100 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Subscription Plans</h2>
+      <p class="text-secondary m-0">Configure resource limits and modular feature locks for tenant companies</p>
+    </div>
+  </div>
+
+  <!-- Plans Pricing Cards Grid -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4" *ngFor="let p of plans">
+      <div class="glass-card hover-glow h-100 d-flex flex-column border-primary relative overflow-hidden">
+        
+        <div class="position-absolute top-0 end-0 p-3">
+          <span class="badge bg-primary bg-white bg-opacity-50 text-primary fw-semibold px-2.5 py-1">Tier Active</span>
+        </div>
+
+        <div class="mb-3">
+          <h4 class="fw-bold text-dark mb-1">{{ p.name }}</h4>
+          <p class="text-secondary small">{{ p.description }}</p>
+        </div>
+        
+        <h2 class="fw-extrabold text-dark mb-4 mt-2">
+          ${{ p.price }}<span class="fs-6 text-secondary fw-normal"> / mo</span>
+        </h2>
+
+        <div class="hr-theme opacity-25 mb-4"></div>
+
+        <ul class="list-unstyled d-flex flex-column gap-3 mb-4 text-secondary">
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-primary fs-5"></i>
+            <span>Fleet Limit: <strong>{{ p.maxCars }} cars</strong></span>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-people-fill text-primary fs-5"></i>
+            <span>Staff Limit: <strong>{{ p.maxUsers }} seats</strong></span>
+          </li>
+          <li class="mt-2">
+            <span class="text-secondary small fw-bold d-block mb-2">ENABLED ACCESS MODULES:</span>
+            <div class="d-flex flex-wrap gap-1.5">
+              <span class="badge bg-secondary text-secondary border border-secondary px-2.5 py-1" *ngFor="let m of p.enabledModules">
+                <i class="bi bi-app-indicator me-1"></i>{{ m }}
+              </span>
+            </div>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Plan Panel (Super Admin only) -->
+  <div class="glass-card border border-secondary" *ngIf="currentUser?.role === 'SUPER_ADMIN'">
+    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-plus-circle text-primary me-2"></i>Create New Subscription Tier</h4>
+    
+    <form (ngSubmit)="createPlan()">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label text-secondary small fw-bold">Plan Name</label>
+          <input type="text" class="form-control  border-secondary text-dark" name="planName" [(ngModel)]="newPlan.name" placeholder="e.g. Enterprise Pro" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-secondary small fw-bold">Price ($ / mo)</label>
+          <input type="number" class="form-control  border-secondary text-dark" name="planPrice" [(ngModel)]="newPlan.price" placeholder="199" required>
+        </div>
+      </div>
+      
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label text-secondary small fw-bold">Maximum Fleet Vehicles</label>
+          <input type="number" class="form-control  border-secondary text-dark" name="planMaxCars" [(ngModel)]="newPlan.maxCars" placeholder="50" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-secondary small fw-bold">Maximum Staff Users</label>
+          <input type="number" class="form-control  border-secondary text-dark" name="planMaxUsers" [(ngModel)]="newPlan.maxUsers" placeholder="15" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-secondary small fw-bold">Plan Description</label>
+        <textarea class="form-control  border-secondary text-dark" name="planDesc" [(ngModel)]="newPlan.description" rows="2" placeholder="Describe the details of the tier..." required></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label text-secondary small fw-bold d-block">Module Access Rights</label>
+        <div class="d-flex flex-wrap gap-3">
+          <div class="form-check" *ngFor="let m of ['Cars', 'Drivers', 'Bookings', 'VendorManagement', 'Marketplace', 'Reports']">
+            <input class="form-check-input  border-secondary" type="checkbox" [id]="'module-' + m" (change)="toggleModule(m)">
+            <label class="form-check-label text-secondary" [for]="'module-' + m">{{ m }}</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary bg-gradient px-4 py-2 fw-semibold">
+        <i class="bi bi-check-lg me-2"></i>Create Plan Option
+      </button>
+    </form>
+  </div>
+
+</div>

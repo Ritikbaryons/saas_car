@@ -1,0 +1,469 @@
+<div class="animate-fade-in">
+  <div *ngIf="!showBill()">
+    <div *ngIf="wizardStep() === 0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold m-0" style="color: var(--primary-color)">Enterprise Corporate Booking Module</h2>
+        <p class="text-secondary m-0">Multi-vehicle scheduling and automated complex pricing formulas</p>
+      </div>
+      <button (click)="startWizard()" class="btn btn-primary bg-gradient d-flex align-items-center gap-2">
+        <i class="bi bi-plus-circle"></i>New Booking
+      </button>
+    </div>
+
+    <div *ngIf="successMsg()" class="alert alert-success border-0 bg-success bg-opacity-10 text-success py-3 mb-4">
+      <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg() }}
+    </div>
+
+    <div class="row g-4 mt-4">
+      <div class="col-md-8">
+        <div class="glass-card border border-secondary h-100">
+          <h4 class="fw-bold mb-3" style="color: var(--primary-color)">Active Corporate Journeys</h4>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle m-0" style="color: var(--text-primary)">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Schedule Window</th>
+              <th>Pickup / Drop</th>
+              <th>Est. Fares</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of bookings">
+              <td>
+                <div class="fw-bold">{{ b.customerName }}</div>
+                <span class="text-secondary small">ID: {{ b.id }}</span>
+              </td>
+              <td>
+                <div class="text-secondary small">{{ b.scheduledStart | date:'short' }} to</div>
+                <div class="text-secondary small">{{ b.scheduledEnd | date:'short' }}</div>
+              </td>
+              <td>
+                <div class="text-info small text-truncate" style="max-width: 150px;">{{ b.pickupLocation || 'N/A' }}</div>
+                <div class="text-warning small text-truncate" style="max-width: 150px;">{{ b.dropLocation || 'N/A' }}</div>
+              </td>
+              <td class="text-success fw-bold">${{ b.totalAmount | number:'1.2-2' }}</td>
+              <td>
+                <span class="badge" [class.bg-warning]="b.status === 'Assigned'" [class.bg-info]="b.status === 'InProgress'" [class.bg-success]="b.status === 'Completed'">{{ b.status }}</span>
+              </td>
+              <td class="text-end">
+                <button *ngIf="b.status === 'Assigned'" (click)="startBooking(b.id)" class="btn btn-sm btn-info me-1 bg-gradient">
+                  <i class="bi bi-play-fill"></i>
+                </button>
+                <button *ngIf="b.status === 'InProgress'" (click)="completeBooking(b.id)" class="btn btn-sm btn-success me-1 bg-gradient">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn btn-sm btn-primary bg-gradient ms-1" (click)="generateBill(b)">
+                  <i class="bi bi-receipt me-1"></i> Bill
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="bookings.length === 0">
+              <td colspan="6" class="text-center text-secondary py-4">No active booking requests in system. Click the "New Booking" button above to launch wizard.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="glass-card border border-secondary h-100">
+      <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Onboard New Customer</h4>
+      <form (ngSubmit)="createCustomer()">
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Customer Name</label>
+          <input type="text" class="form-control border-secondary" name="custName" [(ngModel)]="newCustomer.name" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Email Address</label>
+          <input type="email" class="form-control border-secondary" name="custEmail" [(ngModel)]="newCustomer.email" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Phone Number</label>
+          <input type="text" class="form-control border-secondary" name="custPhone" [(ngModel)]="newCustomer.phone" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label text-secondary small fw-bold">Mailing Address</label>
+          <input type="text" class="form-control border-secondary" name="custAddr" [(ngModel)]="newCustomer.address" required>
+        </div>
+        <button type="submit" class="btn btn-outline-primary bg-gradient w-100 py-2 fw-semibold">
+          <i class="bi bi-save me-1"></i>Save Profile
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+  </div>
+
+  <!-- Wizard Modal Frame -->
+  <div class="glass-card mb-4 border border-primary animate-fade-in p-4" *ngIf="wizardStep() > 0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-bold text-dark m-0">
+        <i class="bi bi-magic text-primary me-2"></i>Multi-Vehicle Booking Wizard
+      </h4>
+      <button (click)="wizardStep.set(0)" class="btn-close btn-close"></button>
+    </div>
+
+    <!-- Wizard Steps Indicator -->
+    <div class="d-flex justify-content-center mb-5">
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex flex-column align-items-center">
+          <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 40px; height: 40px;" [ngClass]="wizardStep() >= 1 ? 'bg-primary text-dark' : 'bg-secondary bg-white bg-opacity-50 text-secondary'">1</div>
+          <span class="small fw-bold mt-2" [ngClass]="wizardStep() >= 1 ? 'text-primary' : 'text-secondary'">Schedule & Client</span>
+        </div>
+        <div style="width: 50px; height: 2px;" [ngClass]="wizardStep() >= 2 ? 'bg-primary' : 'bg-secondary'"></div>
+        <div class="d-flex flex-column align-items-center">
+          <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 40px; height: 40px;" [ngClass]="wizardStep() >= 2 ? 'bg-primary text-dark' : 'bg-secondary bg-white bg-opacity-50 text-secondary'">2</div>
+          <span class="small fw-bold mt-2" [ngClass]="wizardStep() >= 2 ? 'text-primary' : 'text-secondary'">Assign Vehicles</span>
+        </div>
+        <div style="width: 50px; height: 2px;" [ngClass]="wizardStep() >= 3 ? 'bg-primary' : 'bg-secondary'"></div>
+        <div class="d-flex flex-column align-items-center">
+          <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 40px; height: 40px;" [ngClass]="wizardStep() >= 3 ? 'bg-primary text-dark' : 'bg-secondary bg-white bg-opacity-50 text-secondary'">3</div>
+          <span class="small fw-bold mt-2" [ngClass]="wizardStep() >= 3 ? 'text-primary' : 'text-secondary'">Review & Submit</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="errorMsg()" class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger py-2 mb-4">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMsg() }}
+    </div>
+
+    <form [formGroup]="bookingForm">
+      <!-- Step 1: Schedule & Client -->
+      <div *ngIf="wizardStep() === 1" class="animate-fade-in">
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Select Client / Customer <span class="text-danger">*</span></label>
+            <select class="form-select border-secondary" formControlName="customerId" [class.is-invalid]="bookingForm.get('customerId')?.touched && bookingForm.get('customerId')?.invalid">
+              <option value="" disabled>Search or Select Customer</option>
+              <option *ngFor="let c of customers" [value]="c.id">{{ c.name }} ({{ c.email }})</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Booking Type <span class="text-danger">*</span></label>
+            <select class="form-select border-secondary" formControlName="bookingType">
+              <option value="Corporate">Corporate</option>
+              <option value="Vendor">Vendor</option>
+              <option value="Marketplace">Marketplace</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Booking Start Time <span class="text-danger">*</span></label>
+            <input type="datetime-local" class="form-control border-secondary" formControlName="scheduledStart" [class.is-invalid]="bookingForm.get('scheduledStart')?.touched && bookingForm.get('scheduledStart')?.invalid">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Booking End Time <span class="text-danger">*</span></label>
+            <input type="datetime-local" class="form-control border-secondary" formControlName="scheduledEnd" [class.is-invalid]="bookingForm.get('scheduledEnd')?.touched && bookingForm.get('scheduledEnd')?.invalid">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Pickup Location <span class="text-danger">*</span></label>
+            <input type="text" class="form-control border-secondary" formControlName="pickupLocation" placeholder="Enter full pickup address" [class.is-invalid]="bookingForm.get('pickupLocation')?.touched && bookingForm.get('pickupLocation')?.invalid">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Drop Location <span class="text-danger">*</span></label>
+            <input type="text" class="form-control border-secondary" formControlName="dropLocation" placeholder="Enter full drop address" [class.is-invalid]="bookingForm.get('dropLocation')?.touched && bookingForm.get('dropLocation')?.invalid">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label text-secondary small fw-bold">Journey Booking Notes</label>
+            <textarea class="form-control border-secondary" rows="3" formControlName="notes" placeholder="Special instructions..."></textarea>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" (click)="nextStep()" class="btn btn-primary px-4 py-2 fw-semibold">Next Step <i class="bi bi-arrow-right ms-2"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Assign Vehicles -->
+      <div *ngIf="wizardStep() === 2" class="animate-fade-in">
+        <div class="row">
+          <div class="col-lg-8">
+            <h5 class="text-dark mb-3 d-flex align-items-center">
+              <i class="bi bi-car-front text-primary me-2"></i> Assigned Vehicles
+            </h5>
+            
+            <div formArrayName="vehicles">
+              <div class="glass-card  bg-white bg-opacity-50 border border-secondary p-4 mb-4 position-relative" *ngFor="let v of vehicles.controls; let i=index" [formGroupName]="i">
+                <button type="button" (click)="removeVehicle(i)" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-3 border-0" title="Remove Vehicle" *ngIf="vehicles.length > 1">
+                  <i class="bi bi-trash fs-5"></i>
+                </button>
+                
+                <h6 class="text-secondary border-bottom border-secondary pb-2 mb-3">Vehicle #{{ i + 1 }} Assignment</h6>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-bold">Select Vehicle</label>
+                    <select class="form-select border-secondary" formControlName="carId" (change)="onCarChange(i)" [class.is-invalid]="v.get('carId')?.touched && v.get('carId')?.invalid">
+                      <option value="" disabled>Select Fleet Vehicle</option>
+                      <optgroup label="Our Own Fleet">
+                        <option *ngFor="let c of cars" [value]="c.id">
+                          {{ c.make }} {{ c.model }} ({{ c.plateNumber }}) - {{ c.color }}
+                        </option>
+                      </optgroup>
+                      <optgroup label="C2C Marketplace Fleet" *ngIf="marketplaceCars.length > 0">
+                        <option *ngFor="let m of marketplaceCars" [value]="'m_' + m.id">
+                          {{ m.providerCompanyName }} - {{ m.plateNumber }} (Driver: {{ m.driverName }})
+                        </option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-bold">Select Driver</label>
+                    <select class="form-select border-secondary" formControlName="driverId">
+                      <option value="">No Driver (Self-Drive)</option>
+                      <option *ngFor="let d of drivers" [value]="d.id">{{ d.firstName }} {{ d.lastName }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-bold">Pricing Type</label>
+                    <select class="form-select border-secondary" formControlName="pricingType">
+                      <option value="Fixed">Fixed Fare</option>
+                      <option value="Per KM">Per KM</option>
+                      <option value="Hourly">Hourly</option>
+                      <option value="Daily">Daily</option>
+                      <option value="Package">Package</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-bold">Quantity</label>
+                    <input type="number" class="form-control border-secondary" formControlName="quantity" min="1">
+                  </div>
+                </div>
+
+                <div class="p-3 rounded  bg-white bg-opacity-50 border border-secondary mb-3">
+                  <!-- Fixed Fare -->
+                  <div class="row g-3" *ngIf="v.get('pricingType')?.value === 'Fixed'">
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Base Rate ($)</label>
+                      <input type="number" class="form-control border-info" formControlName="baseRate">
+                      <small class="text-secondary mt-1 d-block">Formula: Base Rate × Quantity</small>
+                    </div>
+                  </div>
+
+                  <!-- Per KM -->
+                  <div class="row g-3" *ngIf="v.get('pricingType')?.value === 'Per KM'">
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Rate Per KM ($)</label>
+                      <input type="number" class="form-control border-info" formControlName="ratePerKm">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Distance (KM)</label>
+                      <input type="number" class="form-control border-info" formControlName="distance">
+                      <small class="text-secondary mt-1 d-block">Formula: Rate × KM × Quantity</small>
+                    </div>
+                  </div>
+
+                  <!-- Hourly -->
+                  <div class="row g-3" *ngIf="v.get('pricingType')?.value === 'Hourly'">
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Hourly Rate ($)</label>
+                      <input type="number" class="form-control border-info" formControlName="hourlyRate">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Hours</label>
+                      <input type="number" class="form-control border-info" formControlName="hours">
+                      <small class="text-secondary mt-1 d-block">Formula: Rate × Hours × Quantity</small>
+                    </div>
+                  </div>
+
+                  <!-- Daily -->
+                  <div class="row g-3" *ngIf="v.get('pricingType')?.value === 'Daily'">
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Daily Rate ($)</label>
+                      <input type="number" class="form-control border-info" formControlName="dailyRate">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label text-info small fw-bold">Days</label>
+                      <input type="number" class="form-control border-info" formControlName="days">
+                      <small class="text-secondary mt-1 d-block">Formula: Rate × Days × Quantity</small>
+                    </div>
+                  </div>
+
+                  <!-- Package -->
+                  <div class="row g-3" *ngIf="v.get('pricingType')?.value === 'Package'">
+                    <div class="col-md-4">
+                      <label class="form-label text-info small fw-bold">Package Price ($)</label>
+                      <input type="number" class="form-control border-info" formControlName="packagePrice">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-info small fw-bold">Package Hours</label>
+                      <input type="number" class="form-control border-info" formControlName="packageHours">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label text-info small fw-bold">Package KM</label>
+                      <input type="number" class="form-control border-info" formControlName="packageKm">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label text-warning small fw-bold">Actual Hours</label>
+                      <input type="number" class="form-control border-warning" formControlName="actualHours">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label text-warning small fw-bold">Actual KM</label>
+                      <input type="number" class="form-control border-warning" formControlName="actualKm">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label text-danger small fw-bold">Extra Hr Rate ($)</label>
+                      <input type="number" class="form-control border-danger" formControlName="extraHourRate">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label text-danger small fw-bold">Extra KM Rate ($)</label>
+                      <input type="number" class="form-control border-danger" formControlName="extraKmRate">
+                    </div>
+                    <div class="col-12">
+                      <small class="text-secondary d-block">Formula: (Package + Extra Hrs Charge + Extra KM Charge) × Quantity</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row justify-content-end">
+                  <div class="col-md-4">
+                    <label class="form-label text-secondary small fw-bold text-success">Calculated Fare ($)</label>
+                    <input type="number" class="form-control border-success text-success fw-bold fs-5" formControlName="fare" readonly>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <button type="button" (click)="addVehicle()" class="btn btn-outline-primary mt-2 fw-semibold">
+              <i class="bi bi-plus-circle me-2"></i>Add Another Vehicle
+            </button>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="glass-card border border-primary p-4 sticky-top shadow-lg" style="top: 100px;">
+              <h5 class="text-dark mb-4 border-bottom border-secondary pb-2">Booking Summary</h5>
+              <div class="d-flex justify-content-between text-secondary mb-3">
+                <span>Total Vehicles:</span>
+                <span class="text-dark fw-bold">{{ summary().totalVehicles }}</span>
+              </div>
+              <div class="d-flex justify-content-between text-secondary mb-3">
+                <span>Subtotal:</span>
+                <span class="text-dark">${{ summary().subtotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between text-secondary mb-3">
+                <span>Tax ({{ summary().taxPercent }}%):</span>
+                <span class="text-dark">${{ summary().taxAmount | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between text-secondary mb-3">
+                <span>Discount:</span>
+                <span class="text-success">-$0.00</span>
+              </div>
+              <hr class="border-secondary">
+              <div class="d-flex justify-content-between text-dark fs-3 fw-bold mt-3">
+                <span>Grand Total:</span>
+                <span class="text-success">${{ summary().grandTotal | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mt-5 pt-3 border-top border-secondary">
+          <button type="button" (click)="prevStep()" class="btn btn-secondary px-4 py-2"><i class="bi bi-arrow-left me-2"></i> Back</button>
+          <button type="button" (click)="nextStep()" class="btn btn-primary px-4 py-2 fw-semibold">Review Order <i class="bi bi-arrow-right ms-2"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Review & Submit -->
+      <div *ngIf="wizardStep() === 3" class="animate-fade-in">
+        <div class="glass-card  bg-white bg-opacity-50 mb-4 p-4 border border-secondary shadow">
+          <h5 class="text-dark fw-bold mb-4 border-bottom border-secondary pb-2">Booking Information</h5>
+          <div class="row g-3 mb-4 text-secondary">
+            <div class="col-md-3 fw-bold">Client ID:</div><div class="col-md-3 text-dark">{{ bookingForm.value.customerId }}</div>
+            <div class="col-md-3 fw-bold">Booking Type:</div><div class="col-md-3 text-dark"><span class="badge bg-primary">{{ bookingForm.value.bookingType }}</span></div>
+            <div class="col-md-3 fw-bold">Schedule Start:</div><div class="col-md-3 text-dark">{{ bookingForm.value.scheduledStart | date:'medium' }}</div>
+            <div class="col-md-3 fw-bold">Schedule End:</div><div class="col-md-3 text-dark">{{ bookingForm.value.scheduledEnd | date:'medium' }}</div>
+            <div class="col-md-3 fw-bold">Pickup Location:</div><div class="col-md-3 text-dark">{{ bookingForm.value.pickupLocation }}</div>
+            <div class="col-md-3 fw-bold">Drop Location:</div><div class="col-md-3 text-dark">{{ bookingForm.value.dropLocation }}</div>
+            <div class="col-md-3 fw-bold">Notes:</div><div class="col-md-9 text-dark">{{ bookingForm.value.notes || 'None' }}</div>
+          </div>
+
+          <h5 class="text-dark fw-bold mb-3 mt-5">Vehicle Table</h5>
+          <div class="table-responsive mb-4">
+            <table class="table table-bordered border-secondary align-middle">
+              <thead class="table-active">
+                <tr>
+                  <th>Vehicle ID</th>
+                  <th>Driver ID</th>
+                  <th>Qty</th>
+                  <th>Pricing Type</th>
+                  <th>Base Info</th>
+                  <th>Multipliers</th>
+                  <th class="text-end">Fare</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of vehicles.getRawValue()">
+                  <td>{{ v.carId || 'None' }}</td>
+                  <td>{{ v.driverId || 'Self-Drive' }}</td>
+                  <td>{{ v.quantity }}</td>
+                  <td><span class="badge bg-secondary">{{ v.pricingType }}</span></td>
+                  <td>
+                    <span *ngIf="v.pricingType === 'Fixed'">${{ v.baseRate }} Base</span>
+                    <span *ngIf="v.pricingType === 'Per KM'">${{ v.ratePerKm }}/KM</span>
+                    <span *ngIf="v.pricingType === 'Hourly'">${{ v.hourlyRate }}/Hr</span>
+                    <span *ngIf="v.pricingType === 'Daily'">${{ v.dailyRate }}/Day</span>
+                    <span *ngIf="v.pricingType === 'Package'">${{ v.packagePrice }} Pkg ({{ v.packageHours }}h/{{ v.packageKm }}km)</span>
+                  </td>
+                  <td>
+                    <span *ngIf="v.pricingType === 'Per KM'">{{ v.distance }} KM</span>
+                    <span *ngIf="v.pricingType === 'Hourly'">{{ v.hours }} Hrs</span>
+                    <span *ngIf="v.pricingType === 'Daily'">{{ v.days }} Days</span>
+                    <span *ngIf="v.pricingType === 'Package'" class="small text-warning">
+                      Actual: {{ v.actualHours }}h / {{ v.actualKm }}km<br>
+                      Extra: ${{ v.extraHourRate }}/h | ${{ v.extraKmRate }}/km
+                    </span>
+                    <span *ngIf="v.pricingType === 'Fixed'">-</span>
+                  </td>
+                  <td class="text-end text-success fw-bold fs-5">${{ v.fare | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="row justify-content-end mt-4">
+            <div class="col-md-4">
+              <div class="glass-card p-4 border border-secondary shadow-lg">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-secondary">Subtotal:</span>
+                  <span class="text-dark fs-5">${{ summary().subtotal | number:'1.2-2' }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-secondary">Tax ({{ summary().taxPercent }}%):</span>
+                  <span class="text-dark fs-5">${{ summary().taxAmount | number:'1.2-2' }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span class="text-secondary">Discount:</span>
+                  <span class="text-success fs-5">-$0.00</span>
+                </div>
+                <hr class="border-secondary">
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <span class="text-dark fw-bold fs-4">Grand Total:</span>
+                  <span class="text-success fw-bold fs-2">${{ summary().grandTotal | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-5 pt-3 border-top border-secondary">
+          <button type="button" (click)="prevStep()" class="btn btn-secondary px-4 py-2"><i class="bi bi-arrow-left me-2"></i> Back</button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-info px-4 py-2">Save as Draft</button>
+            <button type="button" (click)="submitBooking()" [disabled]="isSubmitting()" class="btn btn-success bg-gradient px-4 py-2 fw-semibold">
+              <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <i class="bi bi-check-circle-fill me-2" *ngIf="!isSubmitting()"></i>Submit Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
+
+  <!-- Generated Bill View -->
+  <app-previewbill *ngIf="showBill()" [selectedBill]="selectedBill" (close)="closeBill()"></app-previewbill>
+</div>

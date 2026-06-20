@@ -1,0 +1,251 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Company-to-Company (C2C) Sharing Marketplace</h2>
+      <p class="text-secondary m-0">Outsource excess booking demand or monetize idle vehicles with neighbor tenant companies</p>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-success border-0 bg-success bg-opacity-10 text-success py-3 mb-4">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Post Shortfall request form -->
+    <div class="col-md-4">
+      <div class="glass-card border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-megaphone-fill text-primary me-2"></i>Post Shortfall Demand</h4>
+        
+        <form (ngSubmit)="createMarketplaceRequest()">
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Vehicle Type Required</label>
+            <select class="form-select  border-secondary text-dark" name="mrType" [(ngModel)]="newMarketplaceRequest.vehicleTypeRequired" required>
+              <option>Sedan</option>
+              <option>SUV</option>
+              <option>Mini-Van</option>
+              <option>Luxury Sedan</option>
+            </select>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Quantity Needed</label>
+              <input type="number" class="form-control  border-secondary text-dark" name="mrQty" [(ngModel)]="newMarketplaceRequest.requiredQty" required>
+            </div>
+            <div class="col">
+              <label class="form-label text-secondary small fw-bold">Target Price ($)</label>
+              <input type="number" class="form-control  border-secondary text-dark" name="mrPrc" [(ngModel)]="newMarketplaceRequest.targetPrice" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Required Start Time</label>
+            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrStart" [(ngModel)]="newMarketplaceRequest.scheduledStart" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold">Required End Time</label>
+            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrEnd" [(ngModel)]="newMarketplaceRequest.scheduledEnd" required>
+          </div>
+          <button type="submit" class="btn btn-primary bg-gradient w-100 py-2.5 fw-bold">
+            <i class="bi bi-send-fill me-2"></i>Post Marketplace Need
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Active Demand Board -->
+    <div class="col-md-8">
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark">Active Sharing Demand Board</h4>
+        
+        <div class="row g-3">
+          <div class="col-md-6" *ngFor="let req of marketplaceRequests">
+            <div class="border border-secondary rounded-3 p-3  bg-white bg-opacity-50">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h5 class="fw-bold text-dark mb-0">{{ req.vehicleTypeRequired }}</h5>
+                  <span class="text-secondary small">Request ID: {{ req.id }}</span>
+                </div>
+                <span class="badge bg-primary px-2.5 py-1.5">${{ req.targetPrice }} / unit</span>
+              </div>
+              <div class="text-secondary small mb-2">
+                <div>Quantity Needed: <strong>{{ req.requiredQty }}</strong></div>
+                <div>Schedule: {{ req.scheduledStart | date:'MM-dd HH:mm' }} to {{ req.scheduledEnd | date:'MM-dd HH:mm' }}</div>
+              </div>
+
+              <!-- Offer Submission Mini Form -->
+              <div class="mt-3 p-2  bg-opacity-30 border border-secondary rounded">
+                <h6 class="text-secondary small fw-bold mb-2">Monetize Idle Assets (Submit Offer)</h6>
+                <div class="row g-1">
+                  <div class="col">
+                    <input type="number" class="form-control form-control-sm  border-secondary text-dark" placeholder="Offer Fares" [(ngModel)]="newMarketplaceOffer.offerPrice">
+                  </div>
+                  <div class="col">
+                    <button (click)="createMarketplaceOffer(req.id)" class="btn btn-outline-info btn-sm w-100">
+                      <i class="bi bi-check-circle"></i> Submit Offer
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div *ngIf="marketplaceRequests.length === 0" class="col-12 text-center py-4 text-secondary">
+            <i class="bi bi-shop fs-2 d-block mb-2"></i>
+            No shortfall requests are currently posted.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Active Offers Received -->
+    <div class="col-md-6">
+      <div class="glass-card border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark">Marketplace Offers Received</h4>
+        <div class="table-responsive">
+          <table class="table table-hover table-hover align-middle m-0">
+            <thead>
+              <tr>
+                <th>Request Details</th>
+                <th>Offered Price</th>
+                <th>Sender Tenant</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let off of marketplaceOffers">
+                <td>
+                  <div class="text-dark fw-bold">Req #{{ off.marketplaceRequestId }}</div>
+                  <span class="text-secondary small">Qty Offered: {{ off.quantityOffered }}</span>
+                </td>
+                <td class="text-success fw-bold">${{ off.offerPrice }}</td>
+                <td>{{ off.sellerCompanyName || 'Partner' }}</td>
+                <td class="text-end">
+                  <ng-container *ngIf="off.buyerTenantId === currentTenantId && off.status === 'Pending'">
+                    <button (click)="acceptMarketplaceOffer(off.id)" class="btn btn-sm btn-success bg-gradient">
+                      <i class="bi bi-check-lg me-1"></i>Accept Offer
+                    </button>
+                  </ng-container>
+                  <ng-container *ngIf="off.tenantId === currentTenantId || off.status !== 'Pending'">
+                    <span class="badge" [class.bg-warning]="off.status === 'Pending'" [class.bg-success]="off.status === 'Accepted'" [class.bg-danger]="off.status === 'Rejected'">
+                      {{ off.tenantId === currentTenantId && off.status === 'Pending' ? 'Submitted' : off.status }}
+                    </span>
+                  </ng-container>
+                </td>
+              </tr>
+              <tr *ngIf="marketplaceOffers.length === 0">
+                <td colspan="4" class="text-center text-secondary py-3">No active offers received.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Assignments -->
+    <div class="col-md-6">
+      <div class="glass-card border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark">Shared Vehicle Assignments</h4>
+        <div class="table-responsive">
+          <table class="table table-hover table-hover align-middle m-0">
+            <thead>
+              <tr>
+                <th>Offer Ref</th>
+                <th>Vehicle & Driver</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let assign of marketplaceAssignments">
+                <tr>
+                  <td class="fw-bold text-dark">Offer #{{ assign.marketplaceOfferId }}</td>
+                  <td>
+                    <div *ngIf="assign.plateNumber !== 'Pending Allocation'">
+                      {{ assign.plateNumber }}<br>
+                      <small class="text-secondary">{{ assign.driverName }}</small>
+                    </div>
+                    <span *ngIf="assign.plateNumber === 'Pending Allocation'" class="badge bg-warning text-dark">Pending Details</span>
+                  </td>
+                  <td><span class="badge bg-success">Assigned</span></td>
+                  <td class="text-end">
+                    <button *ngIf="assign.plateNumber === 'Pending Allocation' && assign.providerCompanyId === currentTenantId" class="btn btn-sm btn-outline-info" (click)="openAssignModal(assign.id)">
+                      Provide Details
+                    </button>
+                    <span *ngIf="assign.plateNumber === 'Pending Allocation' && assign.tenantId === currentTenantId" class="text-warning small fw-bold">
+                      <i class="bi bi-hourglass-split me-1"></i>Awaiting Partner
+                    </span>
+                    <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.tenantId === currentTenantId" class="btn btn-sm btn-outline-primary" (click)="viewDetails(assign)">
+                      <i class="bi bi-eye-fill me-1"></i>View
+                    </button>
+                  </td>
+                </tr>
+                <!-- Inline Assignment Form -->
+                <tr *ngIf="selectedAssignmentId === assign.id">
+                  <td colspan="4" class=" bg-opacity-50">
+                    <div class="row g-2 align-items-end p-2 border border-info rounded">
+                      <div class="col-md-4">
+                        <label class="form-label small text-info mb-1">Select Car to Assign</label>
+                        <select class="form-select form-select-sm  text-dark border-secondary" [(ngModel)]="assignData.carId">
+                          <option value="">-- Choose Car --</option>
+                          <option *ngFor="let c of ownCars" [value]="c.id">{{ c.make }} {{ c.model }} ({{ c.plateNumber }})</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label small text-info mb-1">Select Driver</label>
+                        <select class="form-select form-select-sm  text-dark border-secondary" [(ngModel)]="assignData.driverId">
+                          <option value="">-- Choose Driver --</option>
+                          <option *ngFor="let d of ownDrivers" [value]="d.id">{{ d.firstName }} {{ d.lastName }}</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4 text-end">
+                        <button class="btn btn-sm btn-secondary me-2" (click)="selectedAssignmentId = null">Cancel</button>
+                        <button class="btn btn-sm btn-info" (click)="submitAssignment()">Confirm Assignment</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="marketplaceAssignments.length === 0">
+                <td colspan="4" class="text-center text-secondary py-3">No active marketplace assignments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marketplace Transactions Ledger -->
+  <div class="glass-card border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">C2C Settlements Ledger Logs</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Tx ID</th>
+            <th>Debit Tenant</th>
+            <th>Credit Tenant</th>
+            <th>Settlement Amount</th>
+            <th>Posting Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of marketplaceTransactions">
+            <td class="font-monospace">{{ tx.id }}</td>
+            <td class="text-danger">{{ tx.buyerCompanyName || 'Debited' }}</td>
+            <td class="text-success">{{ tx.sellerCompanyName || 'Credited' }}</td>
+            <td class="text-warning fw-bold">${{ tx.amount }}</td>
+            <td>{{ tx.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td><span class="badge bg-success">{{ tx.status }}</span></td>
+          </tr>
+          <tr *ngIf="marketplaceTransactions.length === 0">
+            <td colspan="6" class="text-center text-secondary py-3">No ledger settlements generated yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

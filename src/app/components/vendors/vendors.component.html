@@ -1,0 +1,177 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0">Partner Vendor Console</h2>
+      <p class="text-secondary m-0">Onboard external transportation partners, register vendor assets, and review accruals</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Onboard Vendor -->
+    <div class="col-md-4">
+      <div class="glass-card border border-secondary">
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-person-plus text-primary me-2"></i>Onboard Partner Vendor</h4>
+        <form (ngSubmit)="createVendor()">
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Vendor Company Name</label>
+            <input type="text" class="form-control  border-secondary text-dark" placeholder="Acme Logistics LLC" name="vName" [(ngModel)]="newVendor.name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Primary Contact Name</label>
+            <input type="text" class="form-control  border-secondary text-dark" placeholder="Robert Smith" name="vContact" [(ngModel)]="newVendor.contactName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Email Address</label>
+            <input type="email" class="form-control  border-secondary text-dark" placeholder="partner@acme.com" name="vEmail" [(ngModel)]="newVendor.email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">Phone Number</label>
+            <input type="text" class="form-control  border-secondary text-dark" placeholder="+1 (555) 019-8732" name="vPhone" [(ngModel)]="newVendor.phone" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold">Business Address</label>
+            <input type="text" class="form-control  border-secondary text-dark" placeholder="500 Broadway St, Chicago, IL" name="vAddr" [(ngModel)]="newVendor.address" required>
+          </div>
+          <button type="submit" class="btn btn-primary bg-gradient w-100 py-2.5 fw-bold">
+            <i class="bi bi-save me-2"></i>Save Vendor Profile
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Onboarded Directory List -->
+    <div class="col-md-8">
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark">Registered Vendors Directory</h4>
+        <div class="row g-3">
+          <div class="col-md-6" *ngFor="let v of vendors">
+            <div class="border border-secondary rounded-3 p-3  bg-white bg-opacity-50 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold text-dark mb-1">{{ v.name }}</h5>
+                <div class="text-secondary small">Contact: {{ v.contactName }}</div>
+                <div class="text-primary small fw-bold mt-1">Due Settlement: ${{ v.balance | number:'1.2-2' }}</div>
+              </div>
+              <button (click)="selectVendor(v)" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-gear-fill me-1"></i>Manage Assets
+              </button>
+            </div>
+          </div>
+          <div *ngIf="vendors.length === 0" class="col-12 text-center py-4 text-secondary">
+            No partner vendors registered yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assets Management (Shown only if vendor is selected) -->
+  <div *ngIf="selectedVendor" class="glass-card border border-primary mb-4 animate-fade-in">
+    <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-box-seam me-2"></i>Asset Logins & Management: {{ selectedVendor.name }}</h4>
+    
+    <div class="row g-4">
+      <!-- Vehicles -->
+      <div class="col-md-6">
+        <div class="p-3 border border-secondary rounded  bg-opacity-10 mb-3">
+          <h6 class="fw-bold mb-3 text-dark">Add Partner Vehicle</h6>
+          <form (ngSubmit)="createVendorVehicle()">
+            <div class="row g-2 mb-2">
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Make (e.g. Ford)" name="vvm" [(ngModel)]="newVendorVehicle.make" required>
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Model (e.g. Transit)" name="vvmo" [(ngModel)]="newVendorVehicle.model" required>
+              </div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Plate" name="vvp" [(ngModel)]="newVendorVehicle.plateNumber" required>
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Color" name="vvc" [(ngModel)]="newVendorVehicle.color" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Save Partner Vehicle</button>
+          </form>
+        </div>
+
+        <table class="table table-hover table-sm table-hover align-middle">
+          <thead>
+            <tr><th>Vehicle Details</th><th>Plate Number</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vv of vendorVehicles">
+              <td>{{ vv.make }} {{ vv.model }}</td>
+              <td><span class="badge bg-secondary font-monospace">{{ vv.plateNumber }}</span></td>
+            </tr>
+            <tr *ngIf="vendorVehicles.length === 0">
+              <td colspan="2" class="text-center text-secondary small py-2">No vehicles onboarded for this vendor.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Drivers -->
+      <div class="col-md-6">
+        <div class="p-3 border border-secondary rounded  bg-opacity-10 mb-3">
+          <h6 class="fw-bold mb-3 text-dark">Add Partner Driver</h6>
+          <form (ngSubmit)="createVendorDriver()">
+            <div class="row g-2 mb-3">
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Driver Name" name="vdn" [(ngModel)]="newVendorDriver.name" required>
+              </div>
+              <div class="col">
+                <input type="text" class="form-control form-control-sm  border-secondary text-dark" placeholder="Phone" name="vdp" [(ngModel)]="newVendorDriver.phone" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Save Partner Driver</button>
+          </form>
+        </div>
+
+        <table class="table table-hover table-sm table-hover align-middle">
+          <thead>
+            <tr><th>Driver Name</th><th>Phone Number</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vd of vendorDrivers">
+              <td>{{ vd.name }}</td>
+              <td>{{ vd.phone }}</td>
+            </tr>
+            <tr *ngIf="vendorDrivers.length === 0">
+              <td colspan="2" class="text-center text-secondary small py-2">No drivers registered for this vendor.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settlements History Table -->
+  <div class="glass-card border border-secondary">
+    <h4 class="fw-bold mb-3 text-dark">Vendor Settlement Ledger Logs</h4>
+    <div class="table-responsive">
+      <table class="table table-hover table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Vendor Partner</th>
+            <th>Paid Fares</th>
+            <th>Payment Date</th>
+            <th>Settlement Reference</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of vendorPayments">
+            <td class="fw-bold text-dark">{{ p.partnerName || 'Vendor partner' }}</td>
+            <td class="text-success fw-bold">+${{ p.amount }}</td>
+            <td>{{ p.paymentDate | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td><span class="badge bg-secondary font-monospace">{{ p.referenceNumber }}</span></td>
+            <td>{{ p.notes }}</td>
+          </tr>
+          <tr *ngIf="vendorPayments.length === 0">
+            <td colspan="5" class="text-center text-secondary py-3">No settlements or ledger records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

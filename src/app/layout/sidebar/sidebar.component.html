@@ -1,0 +1,70 @@
+    <aside *ngIf="currentUser" class="border-end p-3 d-flex flex-column gap-2" style="width: 260px; height: calc(100vh - 70px); border-color: var(--border-color) !important;">
+      
+      <!-- Super Admin Navigation Links -->
+      <ng-container *ngIf="currentUser.role === 'SUPER_ADMIN'">
+        <div class="text-secondary small fw-bold px-2 py-1 uppercase tracking-wider mb-2">SaaS Control Center</div>
+        
+        <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-speedometer2 fs-5"></i> Dashboard
+        </a>
+        
+        <a routerLink="/plans" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-grid-3x3-gap fs-5"></i> Subscription Plans
+        </a>
+        
+        <a routerLink="/tenants" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-building fs-5"></i> Active Companies
+        </a>
+      </ng-container>
+
+      <!-- Company Admin Navigation Links -->
+      <ng-container *ngIf="currentUser.role !== 'SUPER_ADMIN'">
+        <div class="text-secondary small fw-bold px-2 py-1 uppercase tracking-wider mb-2">Fleet Management</div>
+        
+        <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-house-door fs-5"></i> Dashboard
+        </a>
+        
+        <a routerLink="/bookings" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-calendar-event fs-5"></i> Booking Center
+        </a>
+        
+        <a routerLink="/vendors" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-briefcase fs-5"></i> Vendor Portal
+        </a>
+        
+        <a routerLink="/marketplace" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-shop fs-5"></i> C2C Marketplace
+        </a>
+        
+        <a routerLink="/reports" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium">
+          <i class="bi bi-file-earmark-spreadsheet fs-5"></i> Analytics & Reports
+        </a>
+        
+        <!-- Master Setup Dropdown -->
+        <div class="nav-item mt-1">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium" (click)="toggleMasterSetup()" style="cursor: pointer;" [class.active-link]="isMasterSetupOpen">
+            <i class="bi bi-gear fs-5"></i> Master Setup
+            <i class="bi ms-auto fs-7" [class.bi-chevron-down]="!isMasterSetupOpen" [class.bi-chevron-up]="isMasterSetupOpen"></i>
+          </a>
+          <div *ngIf="isMasterSetupOpen" class="mt-1 animate-fade-in">
+            <div class="d-flex flex-column gap-1 ms-4 mt-1 border-start border-secondary ps-2">
+              <a routerLink="/fleet" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
+                <i class="bi bi-truck fs-6"></i> Fleet & Drivers
+              </a>
+              <a routerLink="/users" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
+                <i class="bi bi-shield-lock fs-6"></i> Users & Roles
+              </a>
+              <a routerLink="/general-settings" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
+                <i class="bi bi-sliders fs-6"></i> General Settings
+              </a>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="mt-auto p-3 glass-card rounded text-center small border" style="border-color: var(--border-color) !important; color: var(--text-secondary);">
+        Logged in as:<br>
+        <span class="fw-bold text-truncate d-block mt-1" style="color: var(--primary-color);">{{ currentUser.email }}</span>
+      </div>
+    </aside>
