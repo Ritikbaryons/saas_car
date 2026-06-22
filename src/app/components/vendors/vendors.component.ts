@@ -12,6 +12,10 @@ export class VendorsComponent implements OnInit {
   vendorPayments: any[] = [];
   selectedVendor: any = null;
 
+  payPage = 1;
+  payPageSize = 7;
+  payTotalCount = 0;
+
   newVendor = {
     name: '',
     contactName: '',
@@ -19,6 +23,18 @@ export class VendorsComponent implements OnInit {
     phone: '',
     address: ''
   };
+
+  newPayment = {
+    partnerId: null as number | null,
+    amount: null as number | null,
+    paymentDate: new Date().toISOString().substring(0, 16),
+    referenceNumber: '',
+    notes: ''
+  };
+
+  showPaymentBill = false;
+  selectedPaymentBill: any = null;
+  showPaymentModal = false;
 
   newVendorVehicle = {
     partnerId: null as number | null,
@@ -40,6 +56,7 @@ export class VendorsComponent implements OnInit {
 
   ngOnInit() {
     this.loadVendors();
+    this.loadVendorPayments();
   }
 
   loadVendors() {
@@ -47,10 +64,34 @@ export class VendorsComponent implements OnInit {
       next: (data) => this.vendors = data,
       error: (err) => console.error(err)
     });
-    this.apiService.getVendorSettlements().subscribe({
-      next: (data) => this.vendorPayments = data,
+  }
+
+  loadVendorPayments() {
+    this.apiService.getVendorSettlements(this.payPage, this.payPageSize).subscribe({
+      next: (res) => {
+        this.vendorPayments = res.data;
+        this.payTotalCount = res.totalCount;
+      },
       error: (err) => console.error(err)
     });
+  }
+
+  nextPayPage() {
+    if ((this.payPage * this.payPageSize) < this.payTotalCount) {
+      this.payPage++;
+      this.loadVendorPayments();
+    }
+  }
+
+  prevPayPage() {
+    if (this.payPage > 1) {
+      this.payPage--;
+      this.loadVendorPayments();
+    }
+  }
+
+  get payTotalPages(): number {
+    return Math.ceil(this.payTotalCount / this.payPageSize) || 1;
   }
 
   createVendor() {
@@ -102,5 +143,63 @@ export class VendorsComponent implements OnInit {
       },
       error: (err) => console.error(err)
     });
+  }
+
+  getMagicLink(token: string): string {
+    return `${window.location.origin}/vendor-portal?token=${token}`;
+  }
+
+  copyLink(link: string) {
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard! Send this to your vendor partner.');
+    });
+  }
+
+  sendLinkOnWhatsApp(v: any) {
+    const link = this.getMagicLink(v.magicToken);
+    const text = `Hi ${v.contactName},\n\nPlease update your vehicle availability on our portal:\n${link}`;
+    // Strip non-numeric characters from phone number for wa.me
+    const phone = v.phone ? v.phone.replace(/[^0-9]/g, '') : '';
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
+  openPaymentModal(vendor: any) {
+    this.newPayment.partnerId = vendor.id;
+    this.newPayment.amount = vendor.balance > 0 ? vendor.balance : 0;
+    this.showPaymentModal = true;
+  }
+
+  closePaymentModal() {
+    this.showPaymentModal = false;
+  }
+
+  recordPayment() {
+    if (!this.newPayment.partnerId || this.newPayment.amount == null) return;
+    this.apiService.recordVendorPayment(this.newPayment).subscribe({
+      next: () => {
+        this.loadVendors();
+        this.loadVendorPayments();
+        this.newPayment = {
+          partnerId: null,
+          amount: null,
+          paymentDate: new Date().toISOString().substring(0, 16),
+          referenceNumber: '',
+          notes: ''
+        };
+        this.showPaymentModal = false;
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  generateBill(payment: any) {
+    this.selectedPaymentBill = payment;
+    this.showPaymentBill = true;
+  }
+
+  closeBill() {
+    this.showPaymentBill = false;
+    this.selectedPaymentBill = null;
   }
 }

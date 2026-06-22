@@ -15,10 +15,13 @@ import { MarketplaceComponent } from './components/marketplace/marketplace.compo
 import { UsersRolesComponent } from './components/users-roles/users-roles.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
+import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.component';
+import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'vendor-portal', component: VendorPortalComponent },
   
   // Protected Routes
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
@@ -26,6 +29,7 @@ const routes: Routes = [
   { path: 'tenants', component: TenantsComponent, canActivate: [AuthGuard] },
   { path: 'fleet', component: FleetComponent, canActivate: [AuthGuard] },
   { path: 'bookings', component: BookingsComponent, canActivate: [AuthGuard] },
+  { path: 'bookinghistory', component: BookinghistoryComponent, canActivate: [AuthGuard] },
   { path: 'vendors', component: VendorsComponent, canActivate: [AuthGuard] },
   { path: 'marketplace', component: MarketplaceComponent, canActivate: [AuthGuard] },
   { path: 'users', component: UsersRolesComponent, canActivate: [AuthGuard] },

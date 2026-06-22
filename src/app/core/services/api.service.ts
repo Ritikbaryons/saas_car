@@ -12,8 +12,15 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   // Dashboard
-  getDashboard(): Observable<any> {
-    return this.http.get<any>(`${this.baseApiUrl}/Dashboard`);
+  getDashboard(startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseApiUrl}/Dashboard`;
+    const params = [];
+    if (startDate) params.push(`startDate=${startDate}`);
+    if (endDate) params.push(`endDate=${endDate}`);
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
+    return this.http.get<any>(url);
   }
 
   // Vendors
@@ -21,8 +28,12 @@ export class ApiService {
     return this.http.get<any[]>(`${this.baseApiUrl}/Vendors`);
   }
 
-  getVendorSettlements(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseApiUrl}/Vendors/settlements`);
+  getVendorSettlements(page: number = 1, pageSize: number = 7): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/Vendors/payments?page=${page}&pageSize=${pageSize}`);
+  }
+
+  recordVendorPayment(payment: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/Vendors/payments`, payment);
   }
 
   createVendor(vendor: any): Observable<any> {
@@ -33,12 +44,33 @@ export class ApiService {
     return this.http.get<any[]>(`${this.baseApiUrl}/Vendors/${vendorId}/vehicles`);
   }
 
+  getAllVendorVehicles(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseApiUrl}/Vendors/vehicles/all`);
+  }
+
   getVendorDrivers(vendorId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseApiUrl}/Vendors/${vendorId}/drivers`);
   }
 
+  getAllVendorDrivers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseApiUrl}/Vendors/drivers/all`);
+  }
+
   createVendorVehicle(vehicle: any): Observable<any> {
     return this.http.post<any>(`${this.baseApiUrl}/Vendors/vehicles`, vehicle);
+  }
+
+  // --- Vendor Portal (Public Magic Link) ---
+  getVendorByToken(token: string): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/VendorPortal/${token}`);
+  }
+
+  getVendorVehiclesByToken(token: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseApiUrl}/VendorPortal/${token}/vehicles`);
+  }
+
+  updateVendorVehicleStatus(token: string, vehicleId: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/VendorPortal/${token}/vehicles/${vehicleId}/status`, { status });
   }
 
   createVendorDriver(driver: any): Observable<any> {
@@ -122,8 +154,12 @@ export class ApiService {
     return this.http.put(`${this.baseApiUrl}/Marketplace/assignments/${assignmentId}/assign-vehicle`, data);
   }
 
-  getMarketplaceTransactions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseApiUrl}/Marketplace/transactions`);
+  getMarketplaceTransactions(page: number = 1, pageSize: number = 7): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/Marketplace/transactions?page=${page}&pageSize=${pageSize}`);
+  }
+
+  createMarketplaceTransaction(transaction: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/Marketplace/transactions`, transaction);
   }
 
   // Fleet (Cars & Drivers)
@@ -154,6 +190,10 @@ export class ApiService {
   // Bookings
   getBookings(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseApiUrl}/Bookings`);
+  }
+
+  getBookingHistory(page: number = 1, pageSize: number = 10, search: string = ''): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/Bookings/history?page=${page}&pageSize=${pageSize}&search=${search}`);
   }
 
   createBooking(booking: any): Observable<any> {

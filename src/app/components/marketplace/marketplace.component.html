@@ -1,4 +1,4 @@
-<div class="animate-fade-in">
+<div class="animate-fade-in" [class.d-print-none]="selectedPrintTx">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="fw-bold m-0">Company-to-Company (C2C) Sharing Marketplace</h2>
@@ -114,8 +114,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let off of marketplaceOffers">
-                <td>
+              <ng-container *ngFor="let off of marketplaceOffers">
+                <tr *ngIf="off.status === 'Pending' || off.status === 'Submitted'">
+                  <td>
                   <div class="text-dark fw-bold">Req #{{ off.marketplaceRequestId }}</div>
                   <span class="text-secondary small">Qty Offered: {{ off.quantityOffered }}</span>
                 </td>
@@ -128,12 +129,13 @@
                     </button>
                   </ng-container>
                   <ng-container *ngIf="off.tenantId === currentTenantId || off.status !== 'Pending'">
-                    <span class="badge" [class.bg-warning]="off.status === 'Pending'" [class.bg-success]="off.status === 'Accepted'" [class.bg-danger]="off.status === 'Rejected'">
-                      {{ off.tenantId === currentTenantId && off.status === 'Pending' ? 'Submitted' : off.status }}
+                    <span class="badge bg-warning">
+                      {{ off.tenantId === currentTenantId ? 'Submitted' : off.status }}
                     </span>
                   </ng-container>
                 </td>
               </tr>
+              </ng-container>
               <tr *ngIf="marketplaceOffers.length === 0">
                 <td colspan="4" class="text-center text-secondary py-3">No active offers received.</td>
               </tr>
@@ -179,6 +181,10 @@
                     <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.tenantId === currentTenantId" class="btn btn-sm btn-outline-primary" (click)="viewDetails(assign)">
                       <i class="bi bi-eye-fill me-1"></i>View
                     </button>
+                    <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.tenantId === currentTenantId && assign.settlementStatus !== 'Completed'" class="btn btn-sm btn-primary ms-1 bg-gradient" (click)="openB2BBill(assign)">
+                      <i class="bi bi-receipt me-1"></i>Settle B2B Bill
+                    </button>
+                    <span *ngIf="assign.settlementStatus === 'Completed'" class="badge bg-success ms-1"><i class="bi bi-check-circle me-1"></i>Settled</span>
                   </td>
                 </tr>
                 <!-- Inline Assignment Form -->
@@ -230,22 +236,219 @@
             <th>Settlement Amount</th>
             <th>Posting Date</th>
             <th>Status</th>
+            <th class="text-end d-print-none">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let tx of marketplaceTransactions">
-            <td class="font-monospace">{{ tx.id }}</td>
+            <td class="font-monospace fw-bold text-primary">{{ getSharedTxId(tx) }}</td>
             <td class="text-danger">{{ tx.buyerCompanyName || 'Debited' }}</td>
             <td class="text-success">{{ tx.sellerCompanyName || 'Credited' }}</td>
             <td class="text-warning fw-bold">${{ tx.amount }}</td>
-            <td>{{ tx.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td>{{ tx.transactionDate | date:'yyyy-MM-dd HH:mm' }}</td>
             <td><span class="badge bg-success">{{ tx.status }}</span></td>
+            <td class="text-end d-print-none">
+              <button class="btn btn-sm btn-outline-info me-1" (click)="viewTransaction(tx)" title="View Details">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="printTransactionBill(tx)" title="Print Bill">
+                <i class="bi bi-printer"></i>
+              </button>
+            </td>
           </tr>
           <tr *ngIf="marketplaceTransactions.length === 0">
-            <td colspan="6" class="text-center text-secondary py-3">No ledger settlements generated yet.</td>
+            <td colspan="7" class="text-center text-secondary py-3">No ledger settlements generated yet.</td>
           </tr>
         </tbody>
       </table>
+    </div>
+    
+    <div *ngIf="marketplaceTransactions.length > 0" class="d-flex justify-content-between align-items-center p-3">
+      <div class="text-secondary fw-bold">
+        Total Count: {{ txTotalCount }}
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-secondary">Page {{ txPage }} of {{ txTotalPages }}</span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="prevTxPage()" [disabled]="txPage === 1">
+          <i class="bi bi-chevron-left"></i> Prev
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="nextTxPage()" [disabled]="txPage === txTotalPages">
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- B2B Bill Modal -->
+  <div class="modal d-block" tabindex="-1" *ngIf="selectedB2BAssign" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass-card border border-primary p-2">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-receipt text-primary me-2"></i>B2B Settlement Invoice</h5>
+          <button type="button" class="btn-close" (click)="closeB2BBill()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row mb-4">
+            <div class="col-6">
+              <h6 class="text-secondary mb-1 fw-bold">Billed To (Buyer):</h6>
+              <div class="text-dark fs-5 fw-bold">Your Company</div>
+            </div>
+            <div class="col-6 text-end">
+              <h6 class="text-secondary mb-1 fw-bold">Payable To (Provider):</h6>
+              <div class="text-dark fs-5 fw-bold">{{ selectedB2BAssign.providerCompanyName || 'Partner Company' }}</div>
+            </div>
+          </div>
+          
+          <table class="table table-bordered border-secondary mb-4 align-middle text-dark">
+            <thead class="table-light">
+              <tr>
+                <th>Description</th>
+                <th>Vehicle & Driver</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Marketplace Assignment #{{ selectedB2BAssign.id }}<br><small class="text-secondary">Base agreed duration</small></td>
+                <td>{{ selectedB2BAssign.plateNumber }}<br><small class="text-secondary">{{ selectedB2BAssign.driverName }}</small></td>
+                <td class="text-end fw-bold">${{ selectedB2BAssign.price || 0 | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Booking Extension Overages<br><small class="text-secondary">Additional hours/days (if extended)</small></td>
+                <td>-</td>
+                <td class="text-end text-warning fw-bold">
+                  <input type="number" class="form-control form-control-sm w-50 ms-auto text-end" [(ngModel)]="b2bExtraCharge" placeholder="0.00">
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" class="text-end fw-bold">Total Payable:</td>
+                <td class="text-end text-success fw-bold fs-4">${{ ((selectedB2BAssign.price || 0) + (b2bExtraCharge || 0)) | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="alert alert-info py-2 small border-0">
+            <i class="bi bi-info-circle me-1"></i> Note: Payments are processed via internal wallet or external gateway. Extra charges apply if the vehicle was retained beyond the assignment schedule.
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" (click)="closeB2BBill()">Cancel</button>
+          <button type="button" class="btn btn-success fw-bold px-4 bg-gradient" (click)="processB2BPayment()">
+            <i class="bi bi-credit-card-fill me-2"></i>Process Payment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Transaction Details Modal -->
+<div class="modal d-block d-print-none" tabindex="-1" *ngIf="selectedViewTx" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card border border-info p-2">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-info-circle text-info me-2"></i>Transaction Details</h5>
+        <button type="button" class="btn-close" (click)="closeViewTransaction()"></button>
+      </div>
+      <div class="modal-body p-4 text-dark">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Tx ID (Tracking Ref):</span>
+          <span class="font-monospace text-primary fw-bold">{{ getSharedTxId(selectedViewTx) }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Database ID:</span>
+          <span class="text-secondary small">{{ selectedViewTx.id }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Debit Tenant:</span>
+          <span class="text-danger">{{ selectedViewTx.buyerCompanyName }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Credit Tenant:</span>
+          <span class="text-success">{{ selectedViewTx.sellerCompanyName }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Type:</span>
+          <span>{{ getCleanTxType(selectedViewTx) }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="fw-bold">Posting Date:</span>
+          <span>{{ selectedViewTx.transactionDate | date:'medium' }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2 fs-5">
+          <span class="fw-bold">Amount:</span>
+          <span class="text-warning fw-bold">${{ selectedViewTx.amount }}</span>
+        </div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-secondary" (click)="closeViewTransaction()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print Bill Modal -->
+<div class="modal d-block" tabindex="-1" *ngIf="selectedPrintTx" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-white p-2">
+      <!-- Hidden in Print -->
+      <div class="modal-header border-bottom-0 d-print-none">
+        <button type="button" class="btn-close" (click)="closePrintBill()"></button>
+      </div>
+      <!-- Bill Content (Printed) -->
+      <div class="modal-body p-5 text-dark" id="print-bill-area">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold">INVOICE / RECEIPT</h2>
+          <p class="text-secondary mb-0">C2C Marketplace Settlement</p>
+        </div>
+        
+        <div class="row mb-5">
+          <div class="col-6">
+            <h6 class="text-secondary mb-1 fw-bold">BILLED TO:</h6>
+            <div class="fs-5 fw-bold">{{ selectedPrintTx.buyerCompanyName }}</div>
+          </div>
+          <div class="col-6 text-end">
+            <h6 class="text-secondary mb-1 fw-bold">PAYABLE TO:</h6>
+            <div class="fs-5 fw-bold">{{ selectedPrintTx.sellerCompanyName }}</div>
+          </div>
+        </div>
+
+        <table class="table table-bordered border-dark mb-4 align-middle">
+          <thead class="table-light border-dark">
+            <tr>
+              <th>Description</th>
+              <th>Date</th>
+              <th class="text-end">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>{{ getCleanTxType(selectedPrintTx) }}</strong><br>
+                <small>Tracking Ref: {{ getSharedTxId(selectedPrintTx) }}</small>
+              </td>
+              <td>{{ selectedPrintTx.transactionDate | date:'yyyy-MM-dd HH:mm' }}</td>
+              <td class="text-end fw-bold">${{ selectedPrintTx.amount | number:'1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-end fw-bold fs-5">Total Paid:</td>
+              <td class="text-end text-success fw-bold fs-4">${{ selectedPrintTx.amount | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="text-center text-secondary mt-5 pt-3 border-top border-2 border-dark">
+          <p class="small mb-0">This is a system-generated invoice for C2C Marketplace Settlements.</p>
+          <p class="small">Status: <strong>{{ selectedPrintTx.status }}</strong></p>
+        </div>
+      </div>
+      
+      <!-- Hidden in Print -->
+      <div class="modal-footer border-top-0 d-print-none justify-content-center">
+        <button type="button" class="btn btn-secondary px-4" (click)="closePrintBill()">Cancel</button>
+        <button type="button" class="btn btn-primary px-4" (click)="triggerPrint()">
+          <i class="bi bi-printer me-2"></i>Print Invoice
+        </button>
+      </div>
     </div>
   </div>
 </div>

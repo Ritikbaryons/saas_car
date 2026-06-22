@@ -1,0 +1,100 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0"><i class="bi bi-clock-history text-primary me-2"></i>Booking History</h2>
+      <p class="text-secondary m-0">View all past and completed bookings</p>
+    </div>
+  </div>
+
+  <div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="input-group" style="width: 300px;">
+        <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-secondary"></i></span>
+        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search by customer, location..." 
+               [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+        <button class="btn btn-primary" type="button" (click)="onSearch()">Search</button>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && bookings.length === 0" class="text-center py-5">
+      <i class="bi bi-journal-x fs-1 text-secondary mb-3"></i>
+      <h4 class="text-secondary">No booking history found</h4>
+    </div>
+
+    <div *ngIf="!isLoading && bookings.length > 0" class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Schedule</th>
+            <th>Locations</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of bookings">
+            <td class="fw-bold text-primary">#{{ b.id }}</td>
+            <td>
+              <div class="fw-bold">{{ b.customerName }}</div>
+            </td>
+            <td>
+              <div class="small"><i class="bi bi-calendar-event me-1 text-secondary"></i>{{ b.scheduledStart | date:'short' }}</div>
+              <div class="small"><i class="bi bi-calendar-check me-1 text-secondary"></i>{{ b.scheduledEnd | date:'short' }}</div>
+            </td>
+            <td>
+              <div class="small text-truncate" style="max-width: 200px;" title="{{ b.pickupLocation }}"><i class="bi bi-geo-alt me-1 text-success"></i>{{ b.pickupLocation }}</div>
+              <div class="small text-truncate" style="max-width: 200px;" title="{{ b.dropLocation }}"><i class="bi bi-geo me-1 text-danger"></i>{{ b.dropLocation }}</div>
+            </td>
+            <td>
+              <span class="badge" 
+                    [class.bg-success]="b.status === 'Completed'" 
+                    [class.bg-danger]="b.status === 'Cancelled'"
+                    [class.bg-warning]="b.status !== 'Completed' && b.status !== 'Cancelled'">
+                {{ b.status }}
+              </span>
+            </td>
+            <td class="fw-bold">${{ b.totalAmount }}</td>
+            <td class="text-end">
+              <button class="btn btn-outline-primary btn-sm" (click)="generateBill(b)">
+                <i class="bi bi-receipt"></i> View Bill
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div *ngIf="!isLoading && bookings.length > 0" class="d-flex justify-content-between align-items-center mt-3">
+      <div class="text-secondary fw-bold">
+        Total Count: {{ totalCount }}
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-secondary">Page {{ page }} of {{ totalPages }}</span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="prevPage()" [disabled]="page === 1">
+          <i class="bi bi-chevron-left"></i> Prev
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()" [disabled]="page === totalPages">
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bill Overlay -->
+<div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center" style="z-index: 1050; padding: 2rem;" *ngIf="showBill">
+  <div class="bg-white rounded-3 shadow-lg p-0 h-100 w-100" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+    <div class="p-4">
+      <app-previewbill [selectedBill]="selectedBill" (close)="closeBill()"></app-previewbill>
+    </div>
+  </div>
+</div>

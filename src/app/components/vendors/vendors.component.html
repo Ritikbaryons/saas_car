@@ -6,6 +6,62 @@
     </div>
   </div>
 
+  <!-- Bill Preview Modal -->
+  <div class="modal d-block" tabindex="-1" *ngIf="showPaymentBill" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass-card border border-success p-2">
+        <div class="modal-header border-secondary">
+          <div>
+            <h5 class="modal-title text-success fw-bold m-0"><i class="bi bi-receipt me-2"></i>Settlement Receipt</h5>
+            <p class="text-secondary small m-0">Payment record for {{ selectedPaymentBill?.partnerName }}</p>
+          </div>
+          <button type="button" class="btn-close" (click)="closeBill()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row border-bottom border-secondary pb-4 mb-4">
+            <div class="col-md-6">
+              <h4 class="text-dark fw-bold">FleetFlow SaaS Portal</h4>
+              <p class="text-secondary mb-0">Receipt #{{ selectedPaymentBill?.referenceNumber || selectedPaymentBill?.id }}</p>
+              <p class="text-secondary">Date: {{ selectedPaymentBill?.paymentDate | date:'longDate' }}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <h5 class="text-dark">Paid To:</h5>
+              <p class="text-dark fw-bold mb-0">{{ selectedPaymentBill?.partnerName }}</p>
+              <span class="badge bg-success mt-2">Settled</span>
+            </div>
+          </div>
+
+          <!-- Payment Summary -->
+          <div class="table-responsive mb-4">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Payment Date</th>
+                  <th>Notes</th>
+                  <th class="text-end">Amount Paid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Vendor Earnings Settlement</td>
+                  <td>{{ selectedPaymentBill?.paymentDate | date:'medium' }}</td>
+                  <td>{{ selectedPaymentBill?.notes || 'N/A' }}</td>
+                  <td class="text-end fw-bold text-success fs-5">${{ selectedPaymentBill?.amount | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-5 pt-3 border-top border-secondary text-center">
+            <p class="text-secondary small mb-3">This is a generated receipt for the vendor settlement. Keep it for your records.</p>
+            <button class="btn btn-success bg-gradient" onclick="window.print()"><i class="bi bi-printer me-2"></i>Print Receipt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-4 mb-4">
     <!-- Onboard Vendor -->
     <div class="col-md-4">
@@ -48,10 +104,29 @@
             <div class="border border-secondary rounded-3 p-3  bg-white bg-opacity-50 d-flex justify-content-between align-items-center">
               <div>
                 <h5 class="fw-bold text-dark mb-1">{{ v.name }}</h5>
-                <div class="text-secondary small">Contact: {{ v.contactName }}</div>
-                <div class="text-primary small fw-bold mt-1">Due Settlement: ${{ v.balance | number:'1.2-2' }}</div>
+                <div class="text-secondary small">
+                  Contact: {{ v.contactName }} 
+                  <span class="ms-1 fw-bold"><i class="bi bi-telephone-fill ms-1 me-1 text-muted"></i>{{ v.phone }}</span>
+                </div>
+                <div class="text-primary small fw-bold mt-1" style="cursor: pointer; display: inline-block;" (click)="openPaymentModal(v)" title="Click to Record Payment">
+                  Due Settlement: ${{ v.balance | number:'1.2-2' }} <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </div>
+                
+                <!-- Magic Link -->
+                <div class="mt-2" *ngIf="v.magicToken">
+                  <div class="small fw-bold text-success mb-1"><i class="bi bi-link-45deg"></i> Partner Portal Link:</div>
+                  <div class="input-group input-group-sm">
+                    <input type="text" class="form-control text-secondary bg-light" [value]="getMagicLink(v.magicToken)" readonly>
+                    <button class="btn btn-outline-secondary" type="button" title="Copy Link" (click)="copyLink(getMagicLink(v.magicToken))">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                    <button class="btn btn-success bg-gradient text-white" type="button" title="Send via WhatsApp" (click)="sendLinkOnWhatsApp(v)">
+                      <i class="bi bi-whatsapp me-1"></i> Send Link
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button (click)="selectVendor(v)" class="btn btn-outline-primary btn-sm">
+              <button (click)="selectVendor(v)" class="btn btn-outline-primary btn-sm align-self-start mt-2">
                 <i class="bi bi-gear-fill me-1"></i>Manage Assets
               </button>
             </div>
@@ -100,7 +175,12 @@
           </thead>
           <tbody>
             <tr *ngFor="let vv of vendorVehicles">
-              <td>{{ vv.make }} {{ vv.model }}</td>
+              <td>
+                <div>{{ vv.make }} {{ vv.model }}</div>
+                <span class="badge small" [class.bg-success]="vv.status === 'Available'" [class.bg-danger]="vv.status === 'Busy'">
+                  {{ vv.status || 'Available' }}
+                </span>
+              </td>
               <td><span class="badge bg-secondary font-monospace">{{ vv.plateNumber }}</span></td>
             </tr>
             <tr *ngIf="vendorVehicles.length === 0">
@@ -145,6 +225,42 @@
     </div>
   </div>
 
+  <!-- Record Payment Modal -->
+  <div class="modal d-block" tabindex="-1" *ngIf="showPaymentModal" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card border border-success p-2">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title text-success fw-bold"><i class="bi bi-cash-coin me-2"></i>Record Vendor Payment</h5>
+          <button type="button" class="btn-close" (click)="closePaymentModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form (ngSubmit)="recordPayment()">
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold">Amount ($)</label>
+              <input type="number" class="form-control border-secondary" name="payAmount" [(ngModel)]="newPayment.amount" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold">Payment Date</label>
+              <input type="datetime-local" class="form-control border-secondary" name="payDate" [(ngModel)]="newPayment.paymentDate" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold">Reference #</label>
+              <input type="text" class="form-control border-secondary" placeholder="Txn ID/Cheque" name="payRef" [(ngModel)]="newPayment.referenceNumber">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold">Notes</label>
+              <input type="text" class="form-control border-secondary" placeholder="Optional notes" name="payNotes" [(ngModel)]="newPayment.notes">
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="button" class="btn btn-secondary" (click)="closePaymentModal()">Cancel</button>
+              <button type="submit" class="btn btn-success bg-gradient fw-bold">Pay Now</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Settlements History Table -->
   <div class="glass-card border border-secondary">
     <h4 class="fw-bold mb-3 text-dark">Vendor Settlement Ledger Logs</h4>
@@ -157,6 +273,7 @@
             <th>Payment Date</th>
             <th>Settlement Reference</th>
             <th>Notes</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -166,12 +283,32 @@
             <td>{{ p.paymentDate | date:'yyyy-MM-dd HH:mm' }}</td>
             <td><span class="badge bg-secondary font-monospace">{{ p.referenceNumber }}</span></td>
             <td>{{ p.notes }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" (click)="generateBill(p)">
+                <i class="bi bi-receipt"></i> Bill
+              </button>
+            </td>
           </tr>
           <tr *ngIf="vendorPayments.length === 0">
-            <td colspan="5" class="text-center text-secondary py-3">No settlements or ledger records found.</td>
+            <td colspan="6" class="text-center text-secondary py-3">No settlements or ledger records found.</td>
           </tr>
         </tbody>
       </table>
+    </div>
+    
+    <div *ngIf="vendorPayments.length > 0" class="d-flex justify-content-between align-items-center p-3">
+      <div class="text-secondary fw-bold">
+        Total Count: {{ payTotalCount }}
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-secondary">Page {{ payPage }} of {{ payTotalPages }}</span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="prevPayPage()" [disabled]="payPage === 1">
+          <i class="bi bi-chevron-left"></i> Prev
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="nextPayPage()" [disabled]="payPage === payTotalPages">
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 </div>

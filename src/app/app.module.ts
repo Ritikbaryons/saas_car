@@ -22,6 +22,8 @@ import { PreviewbillComponent } from './components/previewbill/previewbill.compo
 import { HeaderComponent } from './layout/header/header.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
+import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.component';
+import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,9 @@ import { GeneralSettingsComponent } from './components/general-settings/general-
     ReportsComponent,
     HeaderComponent,
     SidebarComponent,
-    GeneralSettingsComponent
+    GeneralSettingsComponent,
+    VendorPortalComponent,
+    BookinghistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +49,8 @@ import { GeneralSettingsComponent } from './components/general-settings/general-
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    BookingsComponent
+    BookingsComponent,
+    PreviewbillComponent
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }

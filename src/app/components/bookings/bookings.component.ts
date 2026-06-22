@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { PreviewbillComponent } from '../previewbill/previewbill.component';
 
 interface SummaryData {
@@ -35,6 +36,9 @@ export class BookingsComponent implements OnInit {
   cars: any[] = [];
   drivers: any[] = [];
   marketplaceCars: any[] = [];
+  vendorCars: any[] = [];
+  vendorDrivers: any[] = [];
+  dependenciesLoaded = false;
 
   bookingForm!: FormGroup;
 
@@ -57,11 +61,11 @@ export class BookingsComponent implements OnInit {
     return { totalVehicles, subtotal, taxPercent, taxAmount, grandTotal };
   });
 
-  constructor(private fb: FormBuilder, private apiService: ApiService) {}
+  constructor(private fb: FormBuilder, private apiService: ApiService, private authService: AuthService) {}
 
   ngOnInit() {
     this.initForm();
-    this.loadInitialData();
+    this.loadBookings();
   }
 
   initForm() {
@@ -133,15 +137,47 @@ export class BookingsComponent implements OnInit {
     const control = this.vehicles.at(index);
     const carId = control.get('carId')?.value;
     if (carId) {
-      const selectedCar = this.cars.find(c => c.id === Number(carId));
-      if (selectedCar && selectedCar.baseRate) {
-        control.patchValue({
-          baseRate: selectedCar.baseRate,
-          dailyRate: selectedCar.baseRate,
-          hourlyRate: selectedCar.baseRate,
-          ratePerKm: selectedCar.baseRate,
-          packagePrice: selectedCar.baseRate
-        });
+      if (String(carId).startsWith('m_')) {
+        const mId = Number(String(carId).replace('m_', ''));
+        const mCar = this.marketplaceCars.find(m => m.id === mId);
+        if (mCar) {
+          if (mCar.driverName) {
+            const driverId = mCar.driverId || -mId; // Fallback to negative ID if driverId is missing
+            const driverExists = this.drivers.find(d => d.id === driverId);
+            if (!driverExists) {
+              this.drivers.push({
+                id: driverId,
+                firstName: mCar.driverName,
+                lastName: '(Marketplace)'
+              });
+            }
+            control.patchValue({ driverId: driverId });
+          }
+        }
+      } else if (String(carId).startsWith('v_')) {
+        const vId = Number(String(carId).replace('v_', ''));
+        const vCar = this.vendorCars.find(v => v.id === vId);
+        // Vendor cars usually have 0 base rate, user types in the package/fare manually.
+        if (vCar) {
+          control.patchValue({
+             baseRate: 0,
+             dailyRate: 0,
+             hourlyRate: 0,
+             ratePerKm: 0,
+             packagePrice: 0
+          });
+        }
+      } else {
+        const selectedCar = this.cars.find(c => c.id === Number(carId));
+        if (selectedCar && selectedCar.baseRate) {
+          control.patchValue({
+            baseRate: selectedCar.baseRate,
+            dailyRate: selectedCar.baseRate,
+            hourlyRate: selectedCar.baseRate,
+            ratePerKm: selectedCar.baseRate,
+            packagePrice: selectedCar.baseRate
+          });
+        }
       }
     }
   }
@@ -188,21 +224,61 @@ export class BookingsComponent implements OnInit {
     });
   }
 
-  loadInitialData() {
+  loadDependencies() {
+    if (this.dependenciesLoaded) return;
+    this.dependenciesLoaded = true;
+
     this.apiService.getCustomers().subscribe(data => this.customers = data);
     this.apiService.getCars().subscribe(data => this.cars = data.filter((c: any) => c.status === 'Available'));
     this.apiService.getDrivers().subscribe(data => this.drivers = data.filter((d: any) => d.status === 'Available'));
+    const currentTenantId = this.authService.currentUserValue?.tenantId;
     this.apiService.getMarketplaceAssignments().subscribe(data => {
-      this.marketplaceCars = data.filter((a: any) => a.plateNumber !== 'Pending Allocation');
+      // 1. Cars we received from others via marketplace
+      this.marketplaceCars = data.filter((a: any) => 
+        a.plateNumber !== 'Pending Allocation' && 
+        a.tenantId === currentTenantId &&
+        a.status !== 'Completed'
+      );
+      
+      // 2. Cars we gave to others via marketplace (should be hidden from our own fleet)
+      const providedCarIds = new Set(
+        data.filter((a: any) => a.providerCompanyId === currentTenantId && a.carId)
+            .map((a: any) => a.carId)
+      );
+      this.cars = this.cars.filter(c => !providedCarIds.has(c.id));
+
+      this.filterBookedMarketplaceCars();
     });
-    this.loadBookings();
+    this.apiService.getAllVendorVehicles().subscribe(data => this.vendorCars = data.filter(v => !v.status || v.status === 'Available'));
+    this.apiService.getAllVendorDrivers().subscribe(data => this.vendorDrivers = data);
   }
 
   loadBookings() {
     this.apiService.getBookings().subscribe({
-      next: (data) => this.bookings = data,
+      next: (data) => {
+        this.bookings = data;
+        this.filterBookedMarketplaceCars();
+      },
       error: (err) => console.error(err)
     });
+  }
+
+  filterBookedMarketplaceCars() {
+    if (this.marketplaceCars.length && this.bookings.length) {
+      // Collect all marketplace car IDs that are in active/completed bookings
+      const bookedIds = new Set<number>();
+      this.bookings.forEach(b => {
+        if (b.vehicles) {
+          b.vehicles.forEach((v: any) => {
+            if (v.assignmentType === 'Marketplace' && v.carId) {
+              bookedIds.add(v.carId);
+            }
+          });
+        }
+      });
+      // Filter out those that are already booked
+      this.marketplaceCars = this.marketplaceCars.filter(m => !bookedIds.has(m.id));
+    }
   }
 
   createCustomer() {
@@ -218,6 +294,7 @@ export class BookingsComponent implements OnInit {
   startWizard() {
     this.wizardStep.set(1);
     this.initForm();
+    this.loadDependencies();
     this.addVehicle();
   }
 
@@ -272,10 +349,39 @@ export class BookingsComponent implements OnInit {
       notes: formVal.notes,
       vehicles: formVal.vehicles.map((v: any) => {
         const isMarketplace = v.carId && String(v.carId).startsWith('m_');
+        const isVendor = v.carId && String(v.carId).startsWith('v_');
+        const isVendorDriver = v.driverId && String(v.driverId).startsWith('vd_');
+        
+        let assignmentType = 'Own';
+        if (isMarketplace) assignmentType = 'Marketplace';
+        else if (isVendor) assignmentType = 'Vendor';
+
+        const rawCarId = isMarketplace ? Number(String(v.carId).replace('m_', '')) : 
+                         (isVendor ? null : (v.carId ? Number(v.carId) : null));
+                         
+        const rawDriverId = isVendorDriver ? null : (v.driverId ? Number(v.driverId) : null);
+
+        // Find Partner ID from car or driver to pass for Vendor Payments
+        let partnerId: number | null = null;
+        let pVehicleId: number | null = null;
+        let pDriverId: number | null = null;
+        
+        if (isVendor) {
+           pVehicleId = Number(String(v.carId).replace('v_', ''));
+           const vCar = this.vendorCars.find(vc => vc.id === pVehicleId);
+           if (vCar) partnerId = vCar.partnerId;
+        }
+        if (isVendorDriver) {
+           pDriverId = Number(String(v.driverId).replace('vd_', ''));
+        }
+
         return {
-          assignmentType: isMarketplace ? 'Marketplace' : 'Own',
-          carId: isMarketplace ? null : (v.carId ? Number(v.carId) : null),
-          driverId: v.driverId ? Number(v.driverId) : null,
+          assignmentType: assignmentType,
+          carId: rawCarId,
+          driverId: rawDriverId,
+          partnerId: partnerId,
+          partnerVehicleId: pVehicleId,
+          partnerDriverId: pDriverId,
           quantity: Number(v.quantity),
           rateType: v.pricingType.replace(' ', ''),
           baseRate: v.pricingType === 'Fixed' ? v.baseRate : v.pricingType === 'Package' ? v.packagePrice : (v.ratePerKm || v.hourlyRate || v.dailyRate || 0),
@@ -314,6 +420,7 @@ export class BookingsComponent implements OnInit {
   }
 
   generateBill(booking: any) {
+    this.loadDependencies();
     this.selectedBill = booking;
     this.showBill.set(true);
   }

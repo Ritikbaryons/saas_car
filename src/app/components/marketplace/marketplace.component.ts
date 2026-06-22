@@ -18,6 +18,19 @@ export class MarketplaceComponent implements OnInit {
   selectedAssignmentId: number | null = null;
   assignData = { carId: '', driverId: '' };
 
+  // For B2B Settlement
+  selectedB2BAssign: any = null;
+  b2bExtraCharge: number = 0;
+
+  // For Transaction View & Print
+  selectedViewTx: any = null;
+  selectedPrintTx: any = null;
+
+  // Pagination for transactions
+  txPage = 1;
+  txPageSize = 7;
+  txTotalCount = 0;
+
   newMarketplaceRequest = {
     requiredQty: 1,
     vehicleTypeRequired: 'Sedan',
@@ -67,16 +80,37 @@ export class MarketplaceComponent implements OnInit {
 
   loadMarketplaceAssignments() {
     this.apiService.getMarketplaceAssignments().subscribe({
-      next: (data) => this.marketplaceAssignments = data,
+      next: (data) => this.marketplaceAssignments = data.filter((a: any) => a.settlementStatus !== 'Settled' && a.status !== 'Completed'),
       error: (err) => console.error(err)
     });
   }
 
   loadMarketplaceTransactions() {
-    this.apiService.getMarketplaceTransactions().subscribe({
-      next: (data) => this.marketplaceTransactions = data,
+    this.apiService.getMarketplaceTransactions(this.txPage, this.txPageSize).subscribe({
+      next: (res) => {
+        this.marketplaceTransactions = res.data;
+        this.txTotalCount = res.totalCount;
+      },
       error: (err) => console.error(err)
     });
+  }
+
+  nextTxPage() {
+    if ((this.txPage * this.txPageSize) < this.txTotalCount) {
+      this.txPage++;
+      this.loadMarketplaceTransactions();
+    }
+  }
+
+  prevTxPage() {
+    if (this.txPage > 1) {
+      this.txPage--;
+      this.loadMarketplaceTransactions();
+    }
+  }
+  
+  get txTotalPages(): number {
+    return Math.ceil(this.txTotalCount / this.txPageSize) || 1;
   }
 
   createMarketplaceRequest() {
@@ -160,5 +194,71 @@ export class MarketplaceComponent implements OnInit {
 
   viewDetails(assign: any) {
     alert(`Marketplace Assignment Details:\n\nProvider Company: ${assign.providerCompanyName}\nAssigned Vehicle Plate: ${assign.plateNumber}\nDriver Name: ${assign.driverName}\nDriver Phone: ${assign.driverPhone}\nPrice Agreed: $${assign.price}`);
+  }
+
+  openB2BBill(assign: any) {
+    this.selectedB2BAssign = assign;
+    this.b2bExtraCharge = 0;
+  }
+
+  closeB2BBill() {
+    this.selectedB2BAssign = null;
+    this.b2bExtraCharge = 0;
+  }
+
+  processB2BPayment() {
+    if (!this.selectedB2BAssign) return;
+    
+    const totalPayable = (this.selectedB2BAssign.price || 0) + (this.b2bExtraCharge || 0);
+    
+    const newTx = {
+      marketplaceAssignmentId: this.selectedB2BAssign.id,
+      amount: totalPayable
+    };
+
+    this.apiService.createMarketplaceTransaction(newTx).subscribe({
+      next: () => {
+        this.successMsg = `B2B Payment of $${totalPayable} to ${this.selectedB2BAssign.providerCompanyName} has been processed successfully!`;
+        this.loadMarketplaceTransactions();
+        this.loadMarketplaceAssignments(); // Refresh assignment status
+        this.closeB2BBill();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  viewTransaction(tx: any) {
+    this.selectedViewTx = tx;
+  }
+
+  closeViewTransaction() {
+    this.selectedViewTx = null;
+  }
+
+  printTransactionBill(tx: any) {
+    this.selectedPrintTx = tx;
+  }
+
+  closePrintBill() {
+    this.selectedPrintTx = null;
+  }
+
+  triggerPrint() {
+    window.print();
+  }
+
+  getSharedTxId(tx: any): string {
+    if (tx.transactionType && tx.transactionType.includes('[')) {
+      const match = tx.transactionType.match(/\[(.*?)\]/);
+      return match ? match[1] : tx.id.toString();
+    }
+    return tx.id.toString();
+  }
+
+  getCleanTxType(tx: any): string {
+    if (tx.transactionType && tx.transactionType.includes('[')) {
+      return tx.transactionType.split(' [')[0];
+    }
+    return tx.transactionType;
   }
 }

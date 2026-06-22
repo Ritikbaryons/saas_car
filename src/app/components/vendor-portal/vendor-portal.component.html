@@ -1,0 +1,63 @@
+<div class="container py-5" style="max-width: 600px;">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-secondary">Loading your fleet portal...</p>
+  </div>
+
+  <div *ngIf="errorMsg && !loading" class="alert alert-danger shadow-sm border-0 bg-danger bg-opacity-10 text-danger text-center p-4 rounded-4">
+    <i class="bi bi-x-circle-fill fs-1 d-block mb-2"></i>
+    <h5 class="fw-bold">Access Denied</h5>
+    <p class="m-0">{{ errorMsg }}</p>
+  </div>
+
+  <div *ngIf="vendor && !loading" class="animate-fade-in">
+    <div class="text-center mb-5">
+      <div class="d-inline-flex bg-primary bg-opacity-10 p-3 rounded-circle mb-3">
+        <i class="bi bi-building text-primary fs-2"></i>
+      </div>
+      <h2 class="fw-bold text-dark m-0">{{ vendor.name }}</h2>
+      <p class="text-secondary">Partner Fleet Availability Portal</p>
+    </div>
+
+    <div class="glass-card bg-white p-4 rounded-4 shadow-sm border border-secondary mb-4">
+      <h5 class="fw-bold text-dark mb-4 d-flex align-items-center">
+        <i class="bi bi-car-front text-primary me-2"></i> Your Registered Vehicles
+      </h5>
+      
+      <p class="text-secondary small mb-4">Toggle the switch to let us know if the vehicle is currently available for booking or busy elsewhere.</p>
+
+      <div *ngIf="vehicles.length === 0" class="text-center py-4 text-secondary">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        No vehicles registered under your account.
+      </div>
+
+      <div class="list-group list-group-flush border-top border-secondary pt-2">
+        <div *ngFor="let v of vehicles" class="list-group-item bg-transparent border-bottom border-secondary py-3 px-0 d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="fw-bold text-dark m-0">{{ v.make }} {{ v.model }}</h6>
+            <div class="small text-secondary mt-1">
+              <span class="badge bg-secondary text-white me-2">{{ v.plateNumber }}</span>
+              <span class="text-capitalize">{{ v.color }}</span>
+            </div>
+          </div>
+          
+          <div class="form-check form-switch fs-4 m-0">
+            <input class="form-check-input" type="checkbox" role="switch" 
+                   [id]="'switch_' + v.id"
+                   [checked]="v.status === 'Available'"
+                   (change)="toggleStatus(v)">
+            <label class="form-check-label ms-2 fs-6 fw-bold" [for]="'switch_' + v.id"
+                   [class.text-success]="v.status === 'Available'"
+                   [class.text-danger]="v.status !== 'Available'">
+              {{ v.status === 'Available' ? 'Available' : 'Busy' }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <p class="text-center text-secondary small">
+      Secure Link provided by CarRental SaaS. No login required.
+    </p>
+  </div>
+</div>
