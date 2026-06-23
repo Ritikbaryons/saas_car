@@ -17,6 +17,9 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.component';
 import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
+import { DutyTypesComponent } from './components/duty-types/duty-types.component';
+
+import { ExpensesComponent } from './components/expenses/expenses.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -35,6 +38,8 @@ const routes: Routes = [
   { path: 'users', component: UsersRolesComponent, canActivate: [AuthGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
   { path: 'general-settings', component: GeneralSettingsComponent, canActivate: [AuthGuard] },
+  { path: 'duty-types', component: DutyTypesComponent, canActivate: [AuthGuard] },
+  { path: 'car-management', component: ExpensesComponent, canActivate: [AuthGuard] },
   
   // Wildcard Route
   { path: '**', redirectTo: '/dashboard' }

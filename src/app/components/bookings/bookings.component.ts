@@ -38,6 +38,7 @@ export class BookingsComponent implements OnInit {
   marketplaceCars: any[] = [];
   vendorCars: any[] = [];
   vendorDrivers: any[] = [];
+  dutyTypes: any[] = [];
   dependenciesLoaded = false;
 
   bookingForm!: FormGroup;
@@ -72,6 +73,7 @@ export class BookingsComponent implements OnInit {
     this.bookingForm = this.fb.group({
       customerId: ['', Validators.required],
       bookingType: ['Corporate', Validators.required],
+      dutyTypeId: ['', Validators.required],
       scheduledStart: ['', Validators.required],
       scheduledEnd: ['', Validators.required],
       pickupLocation: ['', Validators.required],
@@ -231,6 +233,7 @@ export class BookingsComponent implements OnInit {
     this.apiService.getCustomers().subscribe(data => this.customers = data);
     this.apiService.getCars().subscribe(data => this.cars = data.filter((c: any) => c.status === 'Available'));
     this.apiService.getDrivers().subscribe(data => this.drivers = data.filter((d: any) => d.status === 'Available'));
+    this.apiService.getDutyTypes().subscribe(data => this.dutyTypes = data);
     const currentTenantId = this.authService.currentUserValue?.tenantId;
     this.apiService.getMarketplaceAssignments().subscribe(data => {
       // 1. Cars we received from others via marketplace
@@ -300,7 +303,7 @@ export class BookingsComponent implements OnInit {
 
   nextStep() {
     if (this.wizardStep() === 1) {
-      const step1Valid = ['customerId', 'bookingType', 'scheduledStart', 'scheduledEnd', 'pickupLocation', 'dropLocation']
+      const step1Valid = ['customerId', 'bookingType', 'dutyTypeId', 'scheduledStart', 'scheduledEnd', 'pickupLocation', 'dropLocation']
         .every(field => this.bookingForm.get(field)?.valid);
         
       if (!step1Valid) {
@@ -341,6 +344,7 @@ export class BookingsComponent implements OnInit {
     // Map to the existing backend format
     const payload = {
       customerId: Number(formVal.customerId),
+      dutyTypeId: Number(formVal.dutyTypeId),
       scheduledStart: formVal.scheduledStart,
       scheduledEnd: formVal.scheduledEnd,
       pickupLocation: formVal.pickupLocation,
@@ -413,7 +417,18 @@ export class BookingsComponent implements OnInit {
   }
 
   completeBooking(id: number) {
-    this.apiService.completeBooking(id).subscribe({
+    const kmInput = prompt('Enter Actual Kilometers driven:');
+    const hrInput = prompt('Enter Actual Hours taken:');
+    
+    let payload = {};
+    if (kmInput !== null && hrInput !== null) {
+      payload = {
+        actualDistance: Number(kmInput) || 0,
+        actualHours: Number(hrInput) || 0
+      };
+    }
+
+    this.apiService.completeBooking(id, payload).subscribe({
       next: () => this.loadBookings(),
       error: (err) => console.error(err)
     });

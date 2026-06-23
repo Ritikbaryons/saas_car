@@ -1,0 +1,106 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0 text-dark">Car & General Expenses</h2>
+    <button class="btn btn-primary fw-bold" style="background-color: #6d2c2c; border-color: #6d2c2c; border-radius: 20px; padding: 8px 20px;" (click)="openModal()">ADD EXPENSE</button>
+  </div>
+
+  <div class="glass-card mb-4 border border-secondary bg-white p-4">
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <input type="text" class="form-control form-control-lg bg-light border-0 text-secondary" style="border-radius: 8px;" placeholder="Search by category, car or description..." [(ngModel)]="searchQuery">
+    </div>
+    
+    <!-- Filters and Counter -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <button class="btn btn-outline-secondary btn-sm text-secondary border-secondary"><i class="bi bi-funnel"></i> FILTERS</button>
+      </div>
+      <span class="text-secondary small">Total <b class="text-dark">{{filteredExpenses.length}}</b> records</span>
+    </div>
+
+    <hr class="text-secondary mb-0">
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th class="py-3 text-dark fw-bold border-bottom">Date</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Category</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Car Associated</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Description</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Amount</th>
+            <th class="py-3 text-dark fw-bold border-bottom text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of filteredExpenses">
+            <td class="text-secondary py-3">{{e.expenseDate | date:'mediumDate'}}</td>
+            <td class="fw-bold text-dark py-3">
+              <span class="badge bg-light text-dark border">{{e.category}}</span>
+            </td>
+            <td class="text-secondary py-3">{{e.carName || 'General (No Car)'}}</td>
+            <td class="text-secondary py-3">{{e.description}}</td>
+            <td class="fw-bold text-danger py-3">${{e.amount | number:'1.2-2'}}</td>
+            <td class="text-end py-3">
+              <button class="btn btn-sm btn-light me-2 rounded" (click)="openModal(e)">
+                <i class="bi bi-pencil text-dark"></i>
+              </button>
+              <button class="btn btn-sm btn-light rounded" (click)="deleteExpense(e.id!)">
+                <i class="bi bi-trash text-danger"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredExpenses.length === 0">
+            <td colspan="6" class="text-center text-secondary py-4 border-bottom">No expenses found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade show" tabindex="-1" *ngIf="showModal" style="display: block; background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light border-0">
+        <h5 class="modal-title fw-bold text-dark">{{ editingId ? 'Edit' : 'Add' }} Expense</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control border-secondary text-dark" [(ngModel)]="expenseForm.expenseDate">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Category <span class="text-danger">*</span></label>
+            <select class="form-select border-secondary text-dark" [(ngModel)]="expenseForm.category">
+              <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Amount ($) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control border-secondary text-dark" [(ngModel)]="expenseForm.amount">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Associate with Car (Optional)</label>
+          <select class="form-select border-secondary text-dark" [(ngModel)]="expenseForm.carId">
+            <option [ngValue]="null">-- General Expense (No Car) --</option>
+            <option *ngFor="let car of cars" [value]="car.id">{{car.make}} {{car.model}} ({{car.registrationNumber}})</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Description</label>
+          <textarea class="form-control border-secondary text-dark" rows="3" [(ngModel)]="expenseForm.description" placeholder="Enter details about this expense..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-link text-secondary text-decoration-none fw-bold" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary px-4 fw-bold" style="background-color: #6d2c2c; border-color: #6d2c2c; border-radius: 20px;" (click)="saveExpense()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

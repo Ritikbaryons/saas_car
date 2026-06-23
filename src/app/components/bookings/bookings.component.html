@@ -136,19 +136,26 @@
       <!-- Step 1: Schedule & Client -->
       <div *ngIf="wizardStep() === 1" class="animate-fade-in">
         <div class="row g-4 mb-4">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label text-secondary small fw-bold">Select Client / Customer <span class="text-danger">*</span></label>
             <select class="form-select border-secondary" formControlName="customerId" [class.is-invalid]="bookingForm.get('customerId')?.touched && bookingForm.get('customerId')?.invalid">
               <option value="" disabled>Search or Select Customer</option>
               <option *ngFor="let c of customers" [value]="c.id">{{ c.name }} ({{ c.email }})</option>
             </select>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label text-secondary small fw-bold">Booking Type <span class="text-danger">*</span></label>
             <select class="form-select border-secondary" formControlName="bookingType">
               <option value="Corporate">Corporate</option>
               <option value="Vendor">Vendor</option>
               <option value="Marketplace">Marketplace</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label text-secondary small fw-bold">Duty Type / Rule <span class="text-danger">*</span></label>
+            <select class="form-select border-secondary" formControlName="dutyTypeId" [class.is-invalid]="bookingForm.get('dutyTypeId')?.touched && bookingForm.get('dutyTypeId')?.invalid">
+              <option value="" disabled>Select Duty Type</option>
+              <option *ngFor="let dt of dutyTypes" [value]="dt.id">{{ dt.name }} ({{ dt.type }})</option>
             </select>
           </div>
           <div class="col-md-6">

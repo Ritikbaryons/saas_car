@@ -204,8 +204,8 @@ export class ApiService {
     return this.http.post<any>(`${this.baseApiUrl}/Bookings/${id}/start`, {});
   }
 
-  completeBooking(id: number): Observable<any> {
-    return this.http.post<any>(`${this.baseApiUrl}/Bookings/${id}/complete`, {});
+  completeBooking(id: number, payload?: any): Observable<any> {
+    return this.http.post(`${this.baseApiUrl}/Bookings/${id}/complete`, payload || {});
   }
 
   // Customers
@@ -215,5 +215,43 @@ export class ApiService {
 
   createCustomer(customer: any): Observable<any> {
     return this.http.post<any>(`${this.baseApiUrl}/Customers`, customer);
+  }
+
+  // Duty Types
+  getDutyTypes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseApiUrl}/DutyTypes`);
+  }
+
+  getDutyTypeById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DutyTypes/${id}`);
+  }
+
+  createDutyType(dutyType: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DutyTypes`, dutyType);
+  }
+
+  updateDutyType(id: number, dutyType: any): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/DutyTypes/${id}`, dutyType);
+  }
+
+  deleteDutyType(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseApiUrl}/DutyTypes/${id}`);
+  }
+
+  // Expenses
+  getExpenses(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/Expenses`);
+  }
+  
+  createExpense(data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/Expenses`, data);
+  }
+  
+  updateExpense(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/Expenses/${id}`, data);
+  }
+  
+  deleteExpense(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseApiUrl}/Expenses/${id}`);
   }
 }

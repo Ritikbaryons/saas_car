@@ -81,11 +81,40 @@
       </div>
     </div>
 
+    <!-- Duty Details Section -->
+    <div class="mb-4" *ngIf="selectedBill?.dutyTypeId && selectedBill?.status === 'Completed'">
+      <h5 class="text-dark mb-3"><i class="bi bi-clock-history text-primary me-2"></i>Duty Type: {{ selectedBill?.dutyTypeName }}</h5>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm table-bordered border-secondary align-middle">
+          <thead class="table-active">
+            <tr>
+              <th>Actual Kilometers</th>
+              <th>Extra KM Charge</th>
+              <th>Actual Hours</th>
+              <th class="text-end">Extra Hr Charge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="fw-bold">{{ selectedBill?.actualDistance || 0 }}</span> km</td>
+              <td class="text-danger fw-bold">+${{ (selectedBill?.extraKmCharge || 0) | number:'1.2-2' }}</td>
+              <td><span class="fw-bold">{{ selectedBill?.actualHours || 0 }}</span> hrs</td>
+              <td class="text-end text-danger fw-bold">+${{ (selectedBill?.extraHourCharge || 0) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="d-flex justify-content-end">
       <div class="text-end" style="width: 300px;">
         <div class="d-flex justify-content-between text-secondary mb-2">
-          <span>Subtotal:</span>
-          <span>${{ selectedBill?.totalAmount }}</span>
+          <span>Base Subtotal:</span>
+          <span>${{ (selectedBill?.totalAmount - (selectedBill?.extraKmCharge || 0) - (selectedBill?.extraHourCharge || 0)) | number:'1.2-2' }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger mb-2" *ngIf="selectedBill?.extraKmCharge > 0 || selectedBill?.extraHourCharge > 0">
+          <span>Extra Duty Charges:</span>
+          <span>+${{ ((selectedBill?.extraKmCharge || 0) + (selectedBill?.extraHourCharge || 0)) | number:'1.2-2' }}</span>
         </div>
         <div class="d-flex justify-content-between text-secondary mb-2 border-bottom border-secondary pb-2">
           <span>Tax (15%):</span>

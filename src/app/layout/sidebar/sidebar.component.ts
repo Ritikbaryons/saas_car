@@ -9,6 +9,7 @@ import { AuthService, UserSession } from '../../core/services/auth.service';
 export class SidebarComponent implements OnInit {
   currentUser: UserSession | null = null;
   isMasterSetupOpen = false;
+  isManagementOpen = false;
 
   constructor(public authService: AuthService) {}
 
@@ -20,5 +21,9 @@ export class SidebarComponent implements OnInit {
 
   toggleMasterSetup() {
     this.isMasterSetupOpen = !this.isMasterSetupOpen;
+  }
+
+  toggleManagement() {
+    this.isManagementOpen = !this.isManagementOpen;
   }
 }

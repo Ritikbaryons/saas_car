@@ -45,6 +45,21 @@
           <i class="bi bi-file-earmark-spreadsheet fs-5"></i> Analytics & Reports
         </a>
         
+        <!-- Management Dropdown -->
+        <div class="nav-item mt-1">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium" (click)="toggleManagement()" style="cursor: pointer;" [class.active-link]="isManagementOpen">
+            <i class="bi bi-wallet2 fs-5"></i> Management
+            <i class="bi ms-auto fs-7" [class.bi-chevron-down]="!isManagementOpen" [class.bi-chevron-up]="isManagementOpen"></i>
+          </a>
+          <div *ngIf="isManagementOpen" class="mt-1 animate-fade-in">
+            <div class="d-flex flex-column gap-1 ms-4 mt-1 border-start border-secondary ps-2">
+              <a routerLink="/car-management" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
+                <i class="bi bi-car-front fs-6"></i> Car Management
+              </a>
+            </div>
+          </div>
+        </div>
+        
         <!-- Master Setup Dropdown -->
         <div class="nav-item mt-1">
           <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none fw-medium" (click)="toggleMasterSetup()" style="cursor: pointer;" [class.active-link]="isMasterSetupOpen">
@@ -55,6 +70,9 @@
             <div class="d-flex flex-column gap-1 ms-4 mt-1 border-start border-secondary ps-2">
               <a routerLink="/fleet" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
                 <i class="bi bi-truck fs-6"></i> Fleet & Drivers
+              </a>
+              <a routerLink="/duty-types" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
+                <i class="bi bi-card-checklist fs-6"></i> Duty Types
               </a>
               <a routerLink="/users" routerLinkActive="active-link" class="nav-link d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none fw-medium small">
                 <i class="bi bi-shield-lock fs-6"></i> Users & Roles

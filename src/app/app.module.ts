@@ -24,6 +24,8 @@ import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.component';
 import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
+import { DutyTypesComponent } from './components/duty-types/duty-types.component';
+import { ExpensesComponent } from './components/expenses/expenses.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,9 @@ import { BookinghistoryComponent } from './components/bookinghistory/bookinghist
     SidebarComponent,
     GeneralSettingsComponent,
     VendorPortalComponent,
-    BookinghistoryComponent
+    BookinghistoryComponent,
+    DutyTypesComponent,
+    ExpensesComponent
   ],
   imports: [
     BrowserModule,

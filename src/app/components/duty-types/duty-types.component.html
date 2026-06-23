@@ -1,0 +1,111 @@
+<div class="animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0 text-dark">Duty Types</h2>
+    <button class="btn btn-primary fw-bold" style="background-color: #6d2c2c; border-color: #6d2c2c; border-radius: 20px; padding: 8px 20px;" (click)="openModal()">ADD DUTY TYPE</button>
+  </div>
+
+  <div class="glass-card mb-4 border border-secondary bg-white p-4">
+    
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <input type="text" class="form-control form-control-lg bg-light border-0 text-secondary" style="border-radius: 8px;" placeholder="Search by duty type" [(ngModel)]="searchQuery">
+    </div>
+    
+    <!-- Filters and Counter -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <button class="btn btn-outline-secondary btn-sm me-2 text-secondary border-secondary">Distance Calculation Type: Garage to Garage</button>
+        <button class="btn btn-outline-secondary btn-sm text-secondary border-secondary"><i class="bi bi-funnel"></i> FILTERS</button>
+      </div>
+      <span class="text-secondary small">Total <b class="text-dark">{{filteredDutyTypes.length}}</b> records</span>
+    </div>
+
+    <hr class="text-secondary mb-0">
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th class="py-3 text-dark fw-bold border-bottom">Name</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Type</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Max. Kilometers</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Max. Hours</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Extra KM Rate</th>
+            <th class="py-3 text-dark fw-bold border-bottom">Extra Hr Rate</th>
+            <th class="py-3 text-dark fw-bold border-bottom text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dt of filteredDutyTypes">
+            <td class="fw-bold text-dark py-3">{{dt.name}}</td>
+            <td class="text-secondary py-3">{{dt.type}}</td>
+            <td class="text-secondary py-3">{{dt.maxKilometers}}</td>
+            <td class="text-secondary py-3">{{dt.maxHours}}</td>
+            <td class="text-secondary py-3">${{dt.extraKmRate}}</td>
+            <td class="text-secondary py-3">${{dt.extraHourRate}}</td>
+            <td class="text-end py-3">
+              <button class="btn btn-sm btn-light me-2 rounded" (click)="openModal(dt)">
+                <i class="bi bi-gear text-dark"></i>
+              </button>
+              <button class="btn btn-sm btn-light rounded" (click)="deleteDutyType(dt.id!)">
+                <i class="bi bi-trash text-danger"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredDutyTypes.length === 0">
+            <td colspan="7" class="text-center text-secondary py-4 border-bottom">No duty types found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade show" tabindex="-1" *ngIf="showModal" style="display: block; background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light border-0">
+        <h5 class="modal-title fw-bold text-dark">{{ editingId ? 'Edit' : 'Add' }} Duty Type</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Name (e.g. 10hr/100km)</label>
+          <input type="text" class="form-control border-secondary text-dark" [(ngModel)]="dutyTypeForm.name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary small fw-bold">Type</label>
+          <select class="form-select border-secondary text-dark" [(ngModel)]="dutyTypeForm.type">
+            <option *ngFor="let t of types" [value]="t">{{t}}</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Max. Kilometers</label>
+            <input type="number" class="form-control border-secondary text-dark" [(ngModel)]="dutyTypeForm.maxKilometers">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Max. Hours</label>
+            <input type="number" class="form-control border-secondary text-dark" [(ngModel)]="dutyTypeForm.maxHours">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Extra KM Rate ($)</label>
+            <input type="number" class="form-control border-secondary text-dark" [(ngModel)]="dutyTypeForm.extraKmRate">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label text-secondary small fw-bold">Extra Hour Rate ($)</label>
+            <input type="number" class="form-control border-secondary text-dark" [(ngModel)]="dutyTypeForm.extraHourRate">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-link text-secondary text-decoration-none fw-bold" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary px-4 fw-bold" style="background-color: #6d2c2c; border-color: #6d2c2c; border-radius: 20px;" (click)="saveDutyType()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
