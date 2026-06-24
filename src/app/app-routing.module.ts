@@ -20,11 +20,31 @@ import { BookinghistoryComponent } from './components/bookinghistory/bookinghist
 import { DutyTypesComponent } from './components/duty-types/duty-types.component';
 
 import { ExpensesComponent } from './components/expenses/expenses.component';
+import { DriverPortalComponent } from './components/driver-portal/driver-portal.component';
+import { DriverLoginComponent } from './components/driver-app/driver-login/driver-login.component';
+import { DriverLayoutComponent } from './components/driver-app/driver-layout/driver-layout.component';
+import { DriverHomeComponent } from './components/driver-app/driver-home/driver-home.component';
+import { DriverLiveComponent } from './components/driver-app/driver-live/driver-live.component';
+import { DriverHistoryComponent } from './components/driver-app/driver-history/driver-history.component';
+import { DriverAttendanceComponent } from './components/driver-app/driver-attendance/driver-attendance.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'vendor-portal', component: VendorPortalComponent },
+  { path: 'driver-portal/:token', component: DriverPortalComponent },
+  { path: 'driver/login', component: DriverLoginComponent },
+  { 
+    path: 'driver', 
+    component: DriverLayoutComponent,
+    children: [
+      { path: 'home', component: DriverHomeComponent },
+      { path: 'live', component: DriverLiveComponent },
+      { path: 'history', component: DriverHistoryComponent },
+      { path: 'attendance', component: DriverAttendanceComponent },
+      { path: '', redirectTo: 'home', pathMatch: 'full' }
+    ]
+  },
   
   // Protected Routes
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },

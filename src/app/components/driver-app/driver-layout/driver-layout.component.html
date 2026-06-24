@@ -1,0 +1,35 @@
+<div class="driver-app-container">
+  <!-- Top Header for Driver App -->
+  <div class="driver-header bg-primary text-white p-3 d-flex justify-content-between align-items-center shadow-sm">
+    <h5 class="mb-0 fw-bold">Fleet Driver</h5>
+    <div>
+      <i class="bi bi-bell-fill fs-5 me-3"></i>
+      <i class="bi bi-person-circle fs-5"></i>
+    </div>
+  </div>
+
+  <!-- Dynamic Content Area -->
+  <div class="driver-content pb-5">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="driver-bottom-nav fixed-bottom bg-white shadow-lg border-top d-flex justify-content-around p-2">
+    <a routerLink="/driver/home" class="nav-item text-center text-decoration-none" [class.active]="isActive('/driver/home')">
+      <i class="bi fs-4 d-block" [ngClass]="isActive('/driver/home') ? 'bi-house-fill text-primary' : 'bi-house text-muted'"></i>
+      <span class="small" [ngClass]="isActive('/driver/home') ? 'text-primary fw-bold' : 'text-muted'">Home</span>
+    </a>
+    <a routerLink="/driver/live" class="nav-item text-center text-decoration-none" [class.active]="isActive('/driver/live')">
+      <i class="bi fs-4 d-block" [ngClass]="isActive('/driver/live') ? 'bi-car-front-fill text-primary' : 'bi-car-front text-muted'"></i>
+      <span class="small" [ngClass]="isActive('/driver/live') ? 'text-primary fw-bold' : 'text-muted'">Live</span>
+    </a>
+    <a routerLink="/driver/history" class="nav-item text-center text-decoration-none" [class.active]="isActive('/driver/history')">
+      <i class="bi fs-4 d-block" [ngClass]="isActive('/driver/history') ? 'bi-clock-history text-primary fw-bold' : 'bi-clock text-muted'"></i>
+      <span class="small" [ngClass]="isActive('/driver/history') ? 'text-primary fw-bold' : 'text-muted'">History</span>
+    </a>
+    <a routerLink="/driver/attendance" class="nav-item text-center text-decoration-none" [class.active]="isActive('/driver/attendance')">
+      <i class="bi fs-4 d-block" [ngClass]="isActive('/driver/attendance') ? 'bi-calendar-check-fill text-primary' : 'bi-calendar-check text-muted'"></i>
+      <span class="small" [ngClass]="isActive('/driver/attendance') ? 'text-primary fw-bold' : 'text-muted'">Attendance</span>
+    </a>
+  </nav>
+</div>

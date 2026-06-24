@@ -254,4 +254,30 @@ export class ApiService {
   deleteExpense(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseApiUrl}/Expenses/${id}`);
   }
+
+  // Driver Portal (Magic Link)
+  getDriverTripDetails(token: string): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverPortal/${token}`);
+  }
+
+  startDriverTrip(token: string): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverPortal/${token}/start`, {});
+  }
+
+  // Driver App (Authenticated)
+  getDriverHome(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverApp/home`);
+  }
+
+  getDriverLiveRides(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverApp/live`);
+  }
+
+  getDriverHistory(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverApp/history`);
+  }
+
+  punchDriverAttendance(): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverApp/attendance/punch`, {});
+  }
 }

@@ -26,6 +26,13 @@ import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.
 import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
 import { DutyTypesComponent } from './components/duty-types/duty-types.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
+import { DriverPortalComponent } from './components/driver-portal/driver-portal.component';
+import { DriverLoginComponent } from './components/driver-app/driver-login/driver-login.component';
+import { DriverLayoutComponent } from './components/driver-app/driver-layout/driver-layout.component';
+import { DriverHomeComponent } from './components/driver-app/driver-home/driver-home.component';
+import { DriverLiveComponent } from './components/driver-app/driver-live/driver-live.component';
+import { DriverHistoryComponent } from './components/driver-app/driver-history/driver-history.component';
+import { DriverAttendanceComponent } from './components/driver-app/driver-attendance/driver-attendance.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +52,14 @@ import { ExpensesComponent } from './components/expenses/expenses.component';
     VendorPortalComponent,
     BookinghistoryComponent,
     DutyTypesComponent,
-    ExpensesComponent
+    ExpensesComponent,
+    DriverPortalComponent,
+    DriverLoginComponent,
+    DriverLayoutComponent,
+    DriverHomeComponent,
+    DriverLiveComponent,
+    DriverHistoryComponent,
+    DriverAttendanceComponent
   ],
   imports: [
     BrowserModule,

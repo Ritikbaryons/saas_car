@@ -24,4 +24,8 @@ export class AppComponent implements OnInit {
     this.currentUser = null;
     this.router.navigate(['/login']);
   }
+
+  get isDriverApp(): boolean {
+    return this.router.url.startsWith('/driver');
+  }
 }

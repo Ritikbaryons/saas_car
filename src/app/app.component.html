@@ -1,12 +1,12 @@
 <div class="min-vh-100 d-flex flex-column">
   
-  <app-header *ngIf="currentUser"></app-header>
+  <app-header *ngIf="currentUser && !isDriverApp"></app-header>
 
   <div class="flex-grow-1 d-flex">
     
-    <app-sidebar *ngIf="currentUser"></app-sidebar>
+    <app-sidebar *ngIf="currentUser && !isDriverApp"></app-sidebar>
 
-    <main class="flex-grow-1 p-4 overflow-y-auto" style="max-height: calc(100vh - 70px);">
+    <main class="flex-grow-1 overflow-y-auto" [class.p-4]="!isDriverApp" [ngStyle]="!isDriverApp ? {'max-height': 'calc(100vh - 70px)'} : {}">
       <router-outlet></router-outlet>
     </main>
     
