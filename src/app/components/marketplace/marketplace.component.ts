@@ -48,7 +48,7 @@ export class MarketplaceComponent implements OnInit {
   successMsg = '';
   currentTenantId = 0;
 
-  constructor(private apiService: ApiService, private authService: AuthService) {}
+  constructor(private apiService: ApiService, private authService: AuthService) { }
 
   ngOnInit() {
     this.currentTenantId = this.authService.currentUserValue?.tenantId || 0;
@@ -57,6 +57,14 @@ export class MarketplaceComponent implements OnInit {
     this.loadMarketplaceAssignments();
     this.loadMarketplaceTransactions();
     this.loadFleet();
+  }
+
+  get borrowedAssignments() {
+    return this.marketplaceAssignments.filter(a => a.tenantId === this.currentTenantId);
+  }
+
+  get providedAssignments() {
+    return this.marketplaceAssignments.filter(a => a.providerCompanyId === this.currentTenantId);
   }
 
   loadFleet() {
@@ -80,7 +88,7 @@ export class MarketplaceComponent implements OnInit {
 
   loadMarketplaceAssignments() {
     this.apiService.getMarketplaceAssignments().subscribe({
-      next: (data) => this.marketplaceAssignments = data.filter((a: any) => a.settlementStatus !== 'Settled' && a.status !== 'Completed'),
+      next: (data) => this.marketplaceAssignments = data.filter((a: any) => a.settlementStatus !== 'Settled' && a.settlementStatus !== 'Completed'),
       error: (err) => console.error(err)
     });
   }
@@ -108,7 +116,7 @@ export class MarketplaceComponent implements OnInit {
       this.loadMarketplaceTransactions();
     }
   }
-  
+
   get txTotalPages(): number {
     return Math.ceil(this.txTotalCount / this.txPageSize) || 1;
   }
@@ -119,7 +127,7 @@ export class MarketplaceComponent implements OnInit {
       requiredQty: Number(this.newMarketplaceRequest.requiredQty),
       targetPrice: Number(this.newMarketplaceRequest.targetPrice)
     };
-    
+
     this.apiService.createMarketplaceRequest(payload).subscribe({
       next: () => {
         this.successMsg = 'Shortfall request posted to C2C board successfully!';
@@ -208,9 +216,9 @@ export class MarketplaceComponent implements OnInit {
 
   processB2BPayment() {
     if (!this.selectedB2BAssign) return;
-    
+
     const totalPayable = (this.selectedB2BAssign.price || 0) + (this.b2bExtraCharge || 0);
-    
+
     const newTx = {
       marketplaceAssignmentId: this.selectedB2BAssign.id,
       amount: totalPayable

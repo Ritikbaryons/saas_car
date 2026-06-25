@@ -401,6 +401,7 @@ export class BookingsComponent implements OnInit {
         this.successMsg.set('Corporate multi-vehicle booking created successfully!');
         this.wizardStep.set(0);
         this.isSubmitting.set(false);
+        this.loadBookings();
       },
       error: (err) => {
         this.errorMsg.set(err.error?.message || err.error || 'Failed to submit booking.');
@@ -414,6 +415,39 @@ export class BookingsComponent implements OnInit {
       next: () => this.loadBookings(),
       error: (err) => console.error(err)
     });
+  }
+
+  bookingToCancel = signal<number | null>(null);
+
+  cancelBooking(id: number) {
+    this.bookingToCancel.set(id);
+  }
+
+  confirmCancel() {
+    const id = this.bookingToCancel();
+    if (id) {
+      this.apiService.cancelBooking(id).subscribe({
+        next: () => {
+          this.loadBookings();
+          this.bookingToCancel.set(null);
+        },
+        error: (err) => console.error(err)
+      });
+    }
+  }
+
+  closeCancelModal() {
+    this.bookingToCancel.set(null);
+  }
+
+  selectedBookingStatus: any = null;
+
+  viewBookingStatus(booking: any) {
+    this.selectedBookingStatus = booking;
+  }
+
+  closeBookingStatusModal() {
+    this.selectedBookingStatus = null;
   }
 
   completeBooking(id: number) {

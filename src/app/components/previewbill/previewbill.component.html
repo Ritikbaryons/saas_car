@@ -64,6 +64,7 @@
               <th>Base Rate</th>
               <th>Dist/Hrs</th>
               <th class="text-end">Fare</th>
+              <th class="text-center d-print-none">Driver Link</th>
             </tr>
           </thead>
           <tbody>
@@ -75,6 +76,11 @@
               <td>${{ (vehicle.baseRate || 0) | number:'1.2-2' }}</td>
               <td>{{ vehicle.rateType === 'PerKM' ? (vehicle.distance || 0) + ' km' : vehicle.rateType === 'Hourly' ? (vehicle.hours || 0) + ' hrs' : '-' }}</td>
               <td class="text-end text-success fw-bold">${{ (vehicle.fare || 0) | number:'1.2-2' }}</td>
+              <td class="text-center d-print-none">
+                <button *ngIf="vehicle.magicToken && vehicle.assignmentType !== 'Own'" class="btn btn-sm btn-outline-info" (click)="copyMagicLink(vehicle.magicToken)" title="Copy Driver Portal Link">
+                  <i class="bi bi-link-45deg"></i> Copy Link
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>

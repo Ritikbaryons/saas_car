@@ -50,10 +50,16 @@
                 <span class="badge" [class.bg-warning]="b.status === 'Assigned'" [class.bg-info]="b.status === 'InProgress'" [class.bg-success]="b.status === 'Completed'">{{ b.status }}</span>
               </td>
               <td class="text-end">
-                <button *ngIf="b.status === 'Assigned'" (click)="startBooking(b.id)" class="btn btn-sm btn-info me-1 bg-gradient">
+                <button class="btn btn-sm btn-outline-info me-1 bg-gradient" (click)="viewBookingStatus(b)" title="View Vehicle Status">
+                  <i class="bi bi-eye"></i> View
+                </button>
+                <button *ngIf="b.status === 'Assigned'" (click)="startBooking(b.id)" class="btn btn-sm btn-info me-1 bg-gradient" title="Start Booking">
                   <i class="bi bi-play-fill"></i>
                 </button>
-                <button *ngIf="b.status === 'InProgress'" (click)="completeBooking(b.id)" class="btn btn-sm btn-success me-1 bg-gradient">
+                <button *ngIf="b.status === 'Assigned'" (click)="cancelBooking(b.id)" class="btn btn-sm btn-danger me-1 bg-gradient" title="Cancel Booking">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+                <button *ngIf="b.status === 'InProgress'" (click)="completeBooking(b.id)" class="btn btn-sm btn-success me-1 bg-gradient" title="Complete Booking">
                   <i class="bi bi-check-lg"></i>
                 </button>
                 <button class="btn btn-sm btn-primary bg-gradient ms-1" (click)="generateBill(b)">
@@ -483,4 +489,72 @@
 
   <!-- Generated Bill View -->
   <app-previewbill *ngIf="showBill()" [selectedBill]="selectedBill" (close)="closeBill()"></app-previewbill>
+
+  <!-- Cancel Confirmation Modal -->
+  <div class="modal fade show d-block bg-dark bg-opacity-50" tabindex="-1" *ngIf="bookingToCancel() !== null" style="z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+        <div class="modal-header bg-danger bg-gradient text-white border-0">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> Cancel Booking
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeCancelModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="fs-5 text-dark mb-2">Are you sure you want to cancel this booking?</p>
+          <p class="text-secondary mb-0">
+            Canceling this booking will immediately make the assigned vehicle(s) and driver(s) available for other bookings. This action cannot be undone.
+          </p>
+        </div>
+        <div class="modal-footer bg-light border-0">
+          <button type="button" class="btn btn-secondary px-4 py-2" (click)="closeCancelModal()">No, Keep it</button>
+          <button type="button" class="btn btn-danger px-4 py-2 fw-bold" (click)="confirmCancel()">Yes, Cancel Booking</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Booking Status Modal -->
+  <div class="modal fade show d-block bg-dark bg-opacity-50" tabindex="-1" *ngIf="selectedBookingStatus" style="z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+        <div class="modal-header bg-info bg-gradient text-white border-0">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-car-front-fill me-2"></i> Vehicle Status (Booking #{{ selectedBookingStatus.id }})
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeBookingStatusModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Vehicle</th>
+                  <th>Driver</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of selectedBookingStatus.bookingVehicles">
+                  <td>{{ v.carName || v.partnerVehicleName || 'N/A' }}</td>
+                  <td>{{ v.driverName || v.partnerDriverName || 'Self-Drive' }}</td>
+                  <td><span class="badge bg-secondary">{{ v.assignmentType }}</span></td>
+                  <td>
+                    <span class="badge" [class.bg-warning]="v.status === 'Assigned'" [class.bg-info]="v.status === 'Active'" [class.bg-success]="v.status === 'Completed'" [class.bg-danger]="v.status === 'Cancelled'">{{ v.status }}</span>
+                  </td>
+                </tr>
+                <tr *ngIf="!selectedBookingStatus.bookingVehicles || selectedBookingStatus.bookingVehicles.length === 0">
+                  <td colspan="4" class="text-center text-secondary py-3">No vehicle data available for this booking.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0">
+          <button type="button" class="btn btn-secondary px-4 py-2" (click)="closeBookingStatusModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

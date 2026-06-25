@@ -2,7 +2,8 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="fw-bold m-0">Company-to-Company (C2C) Sharing Marketplace</h2>
-      <p class="text-secondary m-0">Outsource excess booking demand or monetize idle vehicles with neighbor tenant companies</p>
+      <p class="text-secondary m-0">Outsource excess booking demand or monetize idle vehicles with neighbor tenant
+        companies</p>
     </div>
   </div>
 
@@ -14,12 +15,14 @@
     <!-- Post Shortfall request form -->
     <div class="col-md-4">
       <div class="glass-card border border-secondary">
-        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-megaphone-fill text-primary me-2"></i>Post Shortfall Demand</h4>
-        
+        <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-megaphone-fill text-primary me-2"></i>Post Shortfall Demand
+        </h4>
+
         <form (ngSubmit)="createMarketplaceRequest()">
           <div class="mb-3">
             <label class="form-label text-secondary small fw-bold">Vehicle Type Required</label>
-            <select class="form-select  border-secondary text-dark" name="mrType" [(ngModel)]="newMarketplaceRequest.vehicleTypeRequired" required>
+            <select class="form-select  border-secondary text-dark" name="mrType"
+              [(ngModel)]="newMarketplaceRequest.vehicleTypeRequired" required>
               <option>Sedan</option>
               <option>SUV</option>
               <option>Mini-Van</option>
@@ -29,20 +32,24 @@
           <div class="row g-2 mb-3">
             <div class="col">
               <label class="form-label text-secondary small fw-bold">Quantity Needed</label>
-              <input type="number" class="form-control  border-secondary text-dark" name="mrQty" [(ngModel)]="newMarketplaceRequest.requiredQty" required>
+              <input type="number" class="form-control  border-secondary text-dark" name="mrQty"
+                [(ngModel)]="newMarketplaceRequest.requiredQty" required>
             </div>
             <div class="col">
               <label class="form-label text-secondary small fw-bold">Target Price ($)</label>
-              <input type="number" class="form-control  border-secondary text-dark" name="mrPrc" [(ngModel)]="newMarketplaceRequest.targetPrice" required>
+              <input type="number" class="form-control  border-secondary text-dark" name="mrPrc"
+                [(ngModel)]="newMarketplaceRequest.targetPrice" required>
             </div>
           </div>
           <div class="mb-3">
             <label class="form-label text-secondary small fw-bold">Required Start Time</label>
-            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrStart" [(ngModel)]="newMarketplaceRequest.scheduledStart" required>
+            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrStart"
+              [(ngModel)]="newMarketplaceRequest.scheduledStart" required>
           </div>
           <div class="mb-4">
             <label class="form-label text-secondary small fw-bold">Required End Time</label>
-            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrEnd" [(ngModel)]="newMarketplaceRequest.scheduledEnd" required>
+            <input type="datetime-local" class="form-control  border-secondary text-dark" name="mrEnd"
+              [(ngModel)]="newMarketplaceRequest.scheduledEnd" required>
           </div>
           <button type="submit" class="btn btn-primary bg-gradient w-100 py-2.5 fw-bold">
             <i class="bi bi-send-fill me-2"></i>Post Marketplace Need
@@ -55,7 +62,7 @@
     <div class="col-md-8">
       <div class="glass-card border border-secondary h-100">
         <h4 class="fw-bold mb-3 text-dark">Active Sharing Demand Board</h4>
-        
+
         <div class="row g-3">
           <div class="col-md-6" *ngFor="let req of marketplaceRequests">
             <div class="border border-secondary rounded-3 p-3  bg-white bg-opacity-50">
@@ -68,7 +75,8 @@
               </div>
               <div class="text-secondary small mb-2">
                 <div>Quantity Needed: <strong>{{ req.requiredQty }}</strong></div>
-                <div>Schedule: {{ req.scheduledStart | date:'MM-dd HH:mm' }} to {{ req.scheduledEnd | date:'MM-dd HH:mm' }}</div>
+                <div>Schedule: {{ req.scheduledStart | date:'MM-dd HH:mm' }} to {{ req.scheduledEnd | date:'MM-dd HH:mm'
+                  }}</div>
               </div>
 
               <!-- Offer Submission Mini Form -->
@@ -76,7 +84,8 @@
                 <h6 class="text-secondary small fw-bold mb-2">Monetize Idle Assets (Submit Offer)</h6>
                 <div class="row g-1">
                   <div class="col">
-                    <input type="number" class="form-control form-control-sm  border-secondary text-dark" placeholder="Offer Fares" [(ngModel)]="newMarketplaceOffer.offerPrice">
+                    <input type="number" class="form-control form-control-sm  border-secondary text-dark"
+                      placeholder="Offer Fares" [(ngModel)]="newMarketplaceOffer.offerPrice">
                   </div>
                   <div class="col">
                     <button (click)="createMarketplaceOffer(req.id)" class="btn btn-outline-info btn-sm w-100">
@@ -100,7 +109,7 @@
 
   <div class="row g-4 mb-4">
     <!-- Active Offers Received -->
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="glass-card border border-secondary">
         <h4 class="fw-bold mb-3 text-dark">Marketplace Offers Received</h4>
         <div class="table-responsive">
@@ -117,24 +126,24 @@
               <ng-container *ngFor="let off of marketplaceOffers">
                 <tr *ngIf="off.status === 'Pending' || off.status === 'Submitted'">
                   <td>
-                  <div class="text-dark fw-bold">Req #{{ off.marketplaceRequestId }}</div>
-                  <span class="text-secondary small">Qty Offered: {{ off.quantityOffered }}</span>
-                </td>
-                <td class="text-success fw-bold">${{ off.offerPrice }}</td>
-                <td>{{ off.sellerCompanyName || 'Partner' }}</td>
-                <td class="text-end">
-                  <ng-container *ngIf="off.buyerTenantId === currentTenantId && off.status === 'Pending'">
-                    <button (click)="acceptMarketplaceOffer(off.id)" class="btn btn-sm btn-success bg-gradient">
-                      <i class="bi bi-check-lg me-1"></i>Accept Offer
-                    </button>
-                  </ng-container>
-                  <ng-container *ngIf="off.tenantId === currentTenantId || off.status !== 'Pending'">
-                    <span class="badge bg-warning">
-                      {{ off.tenantId === currentTenantId ? 'Submitted' : off.status }}
-                    </span>
-                  </ng-container>
-                </td>
-              </tr>
+                    <div class="text-dark fw-bold">Req #{{ off.marketplaceRequestId }}</div>
+                    <span class="text-secondary small">Qty Offered: {{ off.quantityOffered }}</span>
+                  </td>
+                  <td class="text-success fw-bold">${{ off.offerPrice }}</td>
+                  <td>{{ off.sellerCompanyName || 'Partner' }}</td>
+                  <td class="text-end">
+                    <ng-container *ngIf="off.buyerTenantId === currentTenantId && off.status === 'Pending'">
+                      <button (click)="acceptMarketplaceOffer(off.id)" class="btn btn-sm btn-success bg-gradient">
+                        <i class="bi bi-check-lg me-1"></i>Accept Offer
+                      </button>
+                    </ng-container>
+                    <ng-container *ngIf="off.tenantId === currentTenantId || off.status !== 'Pending'">
+                      <span class="badge bg-warning">
+                        {{ off.tenantId === currentTenantId ? 'Submitted' : off.status }}
+                      </span>
+                    </ng-container>
+                  </td>
+                </tr>
               </ng-container>
               <tr *ngIf="marketplaceOffers.length === 0">
                 <td colspan="4" class="text-center text-secondary py-3">No active offers received.</td>
@@ -144,11 +153,13 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Active Assignments -->
+  <div class="row g-4 mb-4">
+    <!-- Vehicles Borrowed -->
     <div class="col-md-6">
-      <div class="glass-card border border-secondary">
-        <h4 class="fw-bold mb-3 text-dark">Shared Vehicle Assignments</h4>
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark">Vehicles Borrowed (Inbound)</h4>
         <div class="table-responsive">
           <table class="table table-hover table-hover align-middle m-0">
             <thead>
@@ -160,7 +171,7 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let assign of marketplaceAssignments">
+              <ng-container *ngFor="let assign of borrowedAssignments">
                 <tr>
                   <td class="fw-bold text-dark">Offer #{{ assign.marketplaceOfferId }}</td>
                   <td>
@@ -172,18 +183,59 @@
                   </td>
                   <td><span class="badge bg-success">Assigned</span></td>
                   <td class="text-end">
-                    <button *ngIf="assign.plateNumber === 'Pending Allocation' && assign.providerCompanyId === currentTenantId" class="btn btn-sm btn-outline-info" (click)="openAssignModal(assign.id)">
-                      Provide Details
-                    </button>
-                    <span *ngIf="assign.plateNumber === 'Pending Allocation' && assign.tenantId === currentTenantId" class="text-warning small fw-bold">
+                    <span *ngIf="assign.plateNumber === 'Pending Allocation'" class="text-warning small fw-bold">
                       <i class="bi bi-hourglass-split me-1"></i>Awaiting Partner
                     </span>
-                    <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.tenantId === currentTenantId" class="btn btn-sm btn-outline-primary" (click)="viewDetails(assign)">
+                    <button *ngIf="assign.plateNumber !== 'Pending Allocation'" class="btn btn-sm btn-outline-primary" (click)="viewDetails(assign)">
                       <i class="bi bi-eye-fill me-1"></i>View
                     </button>
-                    <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.tenantId === currentTenantId && assign.settlementStatus !== 'Completed'" class="btn btn-sm btn-primary ms-1 bg-gradient" (click)="openB2BBill(assign)">
+                    <button *ngIf="assign.plateNumber !== 'Pending Allocation' && assign.settlementStatus !== 'Completed'" class="btn btn-sm btn-primary ms-1 bg-gradient" (click)="openB2BBill(assign)">
                       <i class="bi bi-receipt me-1"></i>Settle B2B Bill
                     </button>
+                    <span *ngIf="assign.settlementStatus === 'Completed'" class="badge bg-success ms-1"><i class="bi bi-check-circle me-1"></i>Settled</span>
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="borrowedAssignments.length === 0">
+                <td colspan="4" class="text-center text-secondary py-3">No inbound shared vehicles.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicles Provided -->
+    <div class="col-md-6">
+      <div class="glass-card border border-secondary h-100">
+        <h4 class="fw-bold mb-3 text-dark">Vehicles Provided (Outbound)</h4>
+        <div class="table-responsive">
+          <table class="table table-hover table-hover align-middle m-0">
+            <thead>
+              <tr>
+                <th>Offer Ref</th>
+                <th>Vehicle & Driver</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let assign of providedAssignments">
+                <tr>
+                  <td class="fw-bold text-dark">Offer #{{ assign.marketplaceOfferId }}</td>
+                  <td>
+                    <div *ngIf="assign.plateNumber !== 'Pending Allocation'">
+                      {{ assign.plateNumber }}<br>
+                      <small class="text-secondary">{{ assign.driverName }}</small>
+                    </div>
+                    <span *ngIf="assign.plateNumber === 'Pending Allocation'" class="badge bg-warning text-dark">Pending Details</span>
+                  </td>
+                  <td><span class="badge bg-success">Assigned</span></td>
+                  <td class="text-end">
+                    <button *ngIf="assign.plateNumber === 'Pending Allocation'" class="btn btn-sm btn-outline-info" (click)="openAssignModal(assign.id)">
+                      Provide Details
+                    </button>
+                    <!-- Provider does not settle bill, they just view it -->
                     <span *ngIf="assign.settlementStatus === 'Completed'" class="badge bg-success ms-1"><i class="bi bi-check-circle me-1"></i>Settled</span>
                   </td>
                 </tr>
@@ -213,8 +265,8 @@
                   </td>
                 </tr>
               </ng-container>
-              <tr *ngIf="marketplaceAssignments.length === 0">
-                <td colspan="4" class="text-center text-secondary py-3">No active marketplace assignments.</td>
+              <tr *ngIf="providedAssignments.length === 0">
+                <td colspan="4" class="text-center text-secondary py-3">No outbound shared vehicles.</td>
               </tr>
             </tbody>
           </table>
@@ -262,7 +314,7 @@
         </tbody>
       </table>
     </div>
-    
+
     <div *ngIf="marketplaceTransactions.length > 0" class="d-flex justify-content-between align-items-center p-3">
       <div class="text-secondary fw-bold">
         Total Count: {{ txTotalCount }}
@@ -284,7 +336,8 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content glass-card border border-primary p-2">
         <div class="modal-header border-secondary">
-          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-receipt text-primary me-2"></i>B2B Settlement Invoice</h5>
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-receipt text-primary me-2"></i>B2B Settlement
+            Invoice</h5>
           <button type="button" class="btn-close" (click)="closeB2BBill()"></button>
         </div>
         <div class="modal-body p-4">
@@ -298,7 +351,7 @@
               <div class="text-dark fs-5 fw-bold">{{ selectedB2BAssign.providerCompanyName || 'Partner Company' }}</div>
             </div>
           </div>
-          
+
           <table class="table table-bordered border-secondary mb-4 align-middle text-dark">
             <thead class="table-light">
               <tr>
@@ -309,25 +362,31 @@
             </thead>
             <tbody>
               <tr>
-                <td>Marketplace Assignment #{{ selectedB2BAssign.id }}<br><small class="text-secondary">Base agreed duration</small></td>
-                <td>{{ selectedB2BAssign.plateNumber }}<br><small class="text-secondary">{{ selectedB2BAssign.driverName }}</small></td>
+                <td>Marketplace Assignment #{{ selectedB2BAssign.id }}<br><small class="text-secondary">Base agreed
+                    duration</small></td>
+                <td>{{ selectedB2BAssign.plateNumber }}<br><small class="text-secondary">{{ selectedB2BAssign.driverName
+                    }}</small></td>
                 <td class="text-end fw-bold">${{ selectedB2BAssign.price || 0 | number:'1.2-2' }}</td>
               </tr>
               <tr>
-                <td>Booking Extension Overages<br><small class="text-secondary">Additional hours/days (if extended)</small></td>
+                <td>Booking Extension Overages<br><small class="text-secondary">Additional hours/days (if
+                    extended)</small></td>
                 <td>-</td>
                 <td class="text-end text-warning fw-bold">
-                  <input type="number" class="form-control form-control-sm w-50 ms-auto text-end" [(ngModel)]="b2bExtraCharge" placeholder="0.00">
+                  <input type="number" class="form-control form-control-sm w-50 ms-auto text-end"
+                    [(ngModel)]="b2bExtraCharge" placeholder="0.00">
                 </td>
               </tr>
               <tr>
                 <td colspan="2" class="text-end fw-bold">Total Payable:</td>
-                <td class="text-end text-success fw-bold fs-4">${{ ((selectedB2BAssign.price || 0) + (b2bExtraCharge || 0)) | number:'1.2-2' }}</td>
+                <td class="text-end text-success fw-bold fs-4">${{ ((selectedB2BAssign.price || 0) + (b2bExtraCharge ||
+                  0)) | number:'1.2-2' }}</td>
               </tr>
             </tbody>
           </table>
           <div class="alert alert-info py-2 small border-0">
-            <i class="bi bi-info-circle me-1"></i> Note: Payments are processed via internal wallet or external gateway. Extra charges apply if the vehicle was retained beyond the assignment schedule.
+            <i class="bi bi-info-circle me-1"></i> Note: Payments are processed via internal wallet or external gateway.
+            Extra charges apply if the vehicle was retained beyond the assignment schedule.
           </div>
         </div>
         <div class="modal-footer border-secondary">
@@ -346,7 +405,8 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content glass-card border border-info p-2">
       <div class="modal-header border-secondary">
-        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-info-circle text-info me-2"></i>Transaction Details</h5>
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-info-circle text-info me-2"></i>Transaction Details
+        </h5>
         <button type="button" class="btn-close" (click)="closeViewTransaction()"></button>
       </div>
       <div class="modal-body p-4 text-dark">
@@ -400,7 +460,7 @@
           <h2 class="fw-bold">INVOICE / RECEIPT</h2>
           <p class="text-secondary mb-0">C2C Marketplace Settlement</p>
         </div>
-        
+
         <div class="row mb-5">
           <div class="col-6">
             <h6 class="text-secondary mb-1 fw-bold">BILLED TO:</h6>
@@ -435,13 +495,13 @@
             </tr>
           </tbody>
         </table>
-        
+
         <div class="text-center text-secondary mt-5 pt-3 border-top border-2 border-dark">
           <p class="small mb-0">This is a system-generated invoice for C2C Marketplace Settlements.</p>
           <p class="small">Status: <strong>{{ selectedPrintTx.status }}</strong></p>
         </div>
       </div>
-      
+
       <!-- Hidden in Print -->
       <div class="modal-footer border-top-0 d-print-none justify-content-center">
         <button type="button" class="btn btn-secondary px-4" (click)="closePrintBill()">Cancel</button>

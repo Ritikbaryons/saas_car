@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,5 +13,13 @@ export class PreviewbillComponent {
 
   onClose() {
     this.close.emit();
+  }
+
+  copyMagicLink(token: string) {
+    if (!token) return;
+    const link = `${window.location.origin}/driver/manage/${token}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Driver Portal Magic Link copied to clipboard!\n\n' + link);
+    });
   }
 }

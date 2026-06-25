@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 export class ApiService {
   private baseApiUrl = environment.baseApiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Dashboard
   getDashboard(startDate?: string, endDate?: string): Observable<any> {
@@ -162,6 +162,10 @@ export class ApiService {
     return this.http.post<any>(`${this.baseApiUrl}/Marketplace/transactions`, transaction);
   }
 
+  payMarketplaceTransaction(id: number): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/Marketplace/transactions/${id}/pay`, {});
+  }
+
   // Fleet (Cars & Drivers)
   getCars(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseApiUrl}/Cars`);
@@ -204,6 +208,10 @@ export class ApiService {
     return this.http.post<any>(`${this.baseApiUrl}/Bookings/${id}/start`, {});
   }
 
+  cancelBooking(id: number): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/Bookings/${id}/cancel`, {});
+  }
+
   completeBooking(id: number, payload?: any): Observable<any> {
     return this.http.post(`${this.baseApiUrl}/Bookings/${id}/complete`, payload || {});
   }
@@ -242,15 +250,15 @@ export class ApiService {
   getExpenses(): Observable<any> {
     return this.http.get<any>(`${this.baseApiUrl}/Expenses`);
   }
-  
+
   createExpense(data: any): Observable<any> {
     return this.http.post<any>(`${this.baseApiUrl}/Expenses`, data);
   }
-  
+
   updateExpense(id: number, data: any): Observable<any> {
     return this.http.put<any>(`${this.baseApiUrl}/Expenses/${id}`, data);
   }
-  
+
   deleteExpense(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseApiUrl}/Expenses/${id}`);
   }
