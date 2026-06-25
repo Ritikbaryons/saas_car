@@ -1,0 +1,107 @@
+<div class="px-2">
+  <h5 class="fw-bold mb-3 mt-2">Manage Trip</h5>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 text-muted">Loading your trip details...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="alert alert-danger text-center shadow-sm border-0 rounded-4">
+    <i class="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="tripDetails && !loading">
+    
+    <div class="card shadow-sm border-0 rounded-4 mb-3 p-3">
+      <!-- Status Badge -->
+      <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <h6 class="fw-bold mb-0 text-dark">Trip Status</h6>
+        <span class="badge rounded-pill px-3 py-2 fs-6" 
+              [ngClass]="{
+                'bg-warning text-dark': tripDetails.assignmentStatus === 'Assigned',
+                'bg-success': tripDetails.assignmentStatus === 'Active',
+                'bg-secondary': tripDetails.assignmentStatus === 'Completed'
+              }">
+          {{ tripDetails.assignmentStatus }}
+        </span>
+      </div>
+
+      <!-- Customer Info -->
+      <h6 class="text-primary mt-2 mb-3"><i class="bi bi-person-badge me-2"></i>Passenger Details</h6>
+      <div class="row bg-light p-3 rounded-3 mx-0 mb-4">
+        <div class="col-6 px-1">
+          <p class="mb-1 text-muted small">Name</p>
+          <p class="fw-bold mb-0">{{ tripDetails.customerName }}</p>
+        </div>
+        <div class="col-6 px-1 text-end">
+          <p class="mb-1 text-muted small">Phone</p>
+          <a [href]="'tel:' + tripDetails.customerPhone" class="fw-bold text-decoration-none btn btn-sm btn-outline-success rounded-pill">
+            <i class="bi bi-telephone-fill me-1"></i> Call
+          </a>
+        </div>
+      </div>
+
+      <!-- Route Info -->
+      <h6 class="text-primary mb-3"><i class="bi bi-map me-2"></i>Route Information</h6>
+      
+      <div class="d-flex position-relative mb-4">
+        <div class="me-3 d-flex flex-column align-items-center">
+          <i class="bi bi-geo-alt-fill text-success fs-5"></i>
+          <div class="border-start border-2 border-dashed flex-grow-1 my-1" style="min-height: 30px;"></div>
+          <i class="bi bi-geo-fill text-danger fs-5"></i>
+        </div>
+        <div class="flex-grow-1 pt-1">
+          <div class="mb-3">
+            <p class="mb-0 text-muted small">Pickup Location</p>
+            <p class="fw-semibold mb-0">{{ tripDetails.pickupLocation }}</p>
+          </div>
+          <div class="mt-4">
+            <p class="mb-0 text-muted small">Drop Location</p>
+            <p class="fw-semibold mb-0">{{ tripDetails.dropLocation }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trip Details -->
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <div class="bg-light p-2 rounded-3 h-100 text-center">
+            <i class="bi bi-calendar-event text-secondary d-block mb-1 fs-5"></i>
+            <p class="mb-0 text-muted small">Scheduled</p>
+            <p class="fw-bold mb-0 small">{{ tripDetails.scheduledStart | date:'shortTime' }}</p>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="bg-light p-2 rounded-3 h-100 text-center">
+            <i class="bi bi-car-front text-secondary d-block mb-1 fs-5"></i>
+            <p class="mb-0 text-muted small">Vehicle</p>
+            <p class="fw-bold mb-0 small">{{ tripDetails.carDetails }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mb-3 bg-light p-3 rounded-3" *ngIf="tripDetails.notes">
+        <p class="mb-1 text-muted small"><i class="bi bi-journal-text me-1"></i>Special Instructions</p>
+        <p class="mb-0 small">{{ tripDetails.notes }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-4" *ngIf="tripDetails.assignmentStatus === 'Assigned'">
+        <button class="btn btn-success btn-lg w-100 rounded-pill shadow-sm" (click)="startTrip()">
+          <i class="bi bi-play-circle-fill me-2"></i> START TRIP
+        </button>
+      </div>
+      
+      <div class="mt-4" *ngIf="tripDetails.assignmentStatus === 'Active'">
+        <div class="alert alert-info text-center rounded-4 border-0 shadow-sm mb-3">
+          <i class="bi bi-info-circle-fill me-2"></i> This trip is currently in progress.
+        </div>
+        <button class="btn btn-danger btn-lg w-100 rounded-pill shadow-sm" (click)="completeTrip()">
+          <i class="bi bi-stop-circle-fill me-2"></i> COMPLETE TRIP
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

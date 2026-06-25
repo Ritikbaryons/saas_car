@@ -260,8 +260,12 @@ export class ApiService {
     return this.http.get<any>(`${this.baseApiUrl}/DriverPortal/${token}`);
   }
 
-  startDriverTrip(token: string): Observable<any> {
-    return this.http.post<any>(`${this.baseApiUrl}/DriverPortal/${token}/start`, {});
+  startDriverTrip(token: string, odometer: number): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverPortal/${token}/start`, { odometer });
+  }
+
+  completeDriverTrip(token: string, odometer: number): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverPortal/${token}/complete`, { odometer });
   }
 
   // Driver App (Authenticated)

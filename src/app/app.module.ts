@@ -26,7 +26,7 @@ import { VendorPortalComponent } from './components/vendor-portal/vendor-portal.
 import { BookinghistoryComponent } from './components/bookinghistory/bookinghistory.component';
 import { DutyTypesComponent } from './components/duty-types/duty-types.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
-import { DriverPortalComponent } from './components/driver-portal/driver-portal.component';
+import { DriverPortalComponent } from './components/driver-app/driver-portal/driver-portal.component';
 import { DriverLoginComponent } from './components/driver-app/driver-login/driver-login.component';
 import { DriverLayoutComponent } from './components/driver-app/driver-layout/driver-layout.component';
 import { DriverHomeComponent } from './components/driver-app/driver-home/driver-home.component';

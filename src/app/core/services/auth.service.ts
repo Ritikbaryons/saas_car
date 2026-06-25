@@ -10,6 +10,7 @@ export interface UserSession {
   email: string;
   role: string;
   tenantId?: number;
+  companyName?: string;
   permissions: string[];
 }
 

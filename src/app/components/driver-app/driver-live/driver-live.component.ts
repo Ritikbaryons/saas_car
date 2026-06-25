@@ -36,7 +36,7 @@ import { ApiService } from '../../../core/services/api.service';
       </div>
 
       <!-- Button to navigate to Magic Link style UI for Start/End Trip functionality if needed -->
-      <a [routerLink]="['/driver-portal', ride.magicToken]" class="btn btn-outline-primary w-100 rounded-pill">Manage Ride</a>
+      <a [routerLink]="['/driver/manage', ride.magicToken]" class="btn btn-outline-primary w-100 rounded-pill">Manage Ride</a>
     </div>
   `
 })

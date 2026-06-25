@@ -8,7 +8,7 @@
       <div class="d-flex align-items-center gap-3">
         <div *ngIf="currentUser" class="d-flex align-items-center gap-2 text-secondary">
           <span class="badge bg-secondary px-2.5 py-1 fw-bold text-uppercase" style="background-color: var(--secondary-color) !important;">{{ currentUser.role }}</span>
-          <span class="fw-bold" style="color: var(--text-primary);">{{ currentUser.email }}</span>
+          <span class="fw-bold" style="color: var(--text-primary);">{{ currentUser.companyName || currentUser.email }}</span>
           <span *ngIf="currentUser.tenantId" class="badge bg-success bg-opacity-25 text-success border border-success">Tenant Active</span>
         </div>
         <button *ngIf="currentUser" (click)="onLogout()" class="btn btn-outline-danger btn-sm px-3 fw-bold">
