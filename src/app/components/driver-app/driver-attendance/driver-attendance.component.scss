@@ -1,0 +1,25 @@
+.driver-attendance-container {
+  .attendance-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
+
+  .border-start-primary {
+    border-left: 5px solid var(--primary-color) !important;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .table {
+    td, th {
+      border-color: #f1f5f9;
+    }
+    
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+  }
+}

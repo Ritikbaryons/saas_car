@@ -33,6 +33,7 @@ import { DriverHomeComponent } from './components/driver-app/driver-home/driver-
 import { DriverLiveComponent } from './components/driver-app/driver-live/driver-live.component';
 import { DriverHistoryComponent } from './components/driver-app/driver-history/driver-history.component';
 import { DriverAttendanceComponent } from './components/driver-app/driver-attendance/driver-attendance.component';
+import { DriverProfileComponent } from './components/driver-app/driver-profile/driver-profile.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { DriverAttendanceComponent } from './components/driver-app/driver-attend
     DriverHomeComponent,
     DriverLiveComponent,
     DriverHistoryComponent,
-    DriverAttendanceComponent
+    DriverAttendanceComponent,
+    DriverProfileComponent
   ],
   imports: [
     BrowserModule,

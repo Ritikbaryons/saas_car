@@ -1,0 +1,142 @@
+<div class="driver-profile-container position-relative pb-5" style="background: linear-gradient(180deg, #e0e7ff 0%, #f8fafc 15%, #f8fafc 100%); min-height: 100vh;" *ngIf="profile; else loading">
+  <!-- Top Header -->
+  <div class="profile-header">
+    <div class="d-flex justify-content-between align-items-center px-3 py-3">
+      <div class="d-flex align-items-center gap-2">
+        <img [src]="profile.avatar || 'https://ui-avatars.com/api/?name=Driver&background=6e2c22&color=fff'" alt="User" class="rounded-circle border border-2 border-white shadow-sm" width="36" height="36">
+        <h5 class="mb-0 fw-bold text-dark ms-1">Profile</h5>
+      </div>
+      <i class="bi bi-gear fs-5 text-secondary"></i>
+    </div>
+  </div>
+
+  <div class="profile-content px-3 pb-5 mt-2">
+    <!-- User Info Section -->
+    <div class="text-center mb-4 position-relative">
+      <div class="position-relative d-inline-block">
+        <img [src]="profile.avatar || 'assets/images/user-placeholder.jpg'" alt="Driver" class="rounded-circle border border-3 border-primary shadow-sm" style="width: 90px; height: 90px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=Driver&background=6e2c22&color=fff'">
+        <span class="position-absolute bottom-0 start-50 translate-middle-x badge bg-success rounded-pill border border-2 border-white px-3 py-1" style="font-size: 0.65rem; margin-bottom: -10px;" *ngIf="profile.isVerified">
+          <i class="bi bi-check-circle-fill me-1"></i> Verified
+        </span>
+      </div>
+      
+      <h4 class="fw-bold text-dark mt-4 mb-1">{{ profile.name || 'N/A' }}</h4>
+      <p class="text-muted small mb-3">Employee ID: {{ profile.employeeId || 'N/A' }}</p>
+
+      <div class="row text-center px-2 mt-4">
+        <div class="col-4">
+          <h5 class="fw-bold text-dark mb-0">{{ profile.yearsExperience || 0 }}</h5>
+          <small class="text-muted d-block" style="font-size: 0.7rem;">Years Exp.</small>
+        </div>
+        <div class="col-4 border-start border-end border-light-subtle">
+          <h5 class="fw-bold text-dark mb-0">{{ profile.rating || '0.0' }} <i class="bi bi-star-fill text-primary" style="font-size: 0.9rem;"></i></h5>
+          <small class="text-muted d-block" style="font-size: 0.7rem;">Rating</small>
+        </div>
+        <div class="col-4">
+          <h5 class="fw-bold text-dark mb-0">{{ profile.totalTrips || 0 }}</h5>
+          <small class="text-muted d-block" style="font-size: 0.7rem;">Trips</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Details Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3 profile-card">
+      <div class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+        <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+          <i class="bi bi-person-lines-fill fs-6"></i> PERSONAL DETAILS
+        </span>
+        <span class="text-primary fw-bold small cursor-pointer" style="font-size: 0.75rem;">Edit</span>
+      </div>
+      <div class="card-body pt-3 pb-3">
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <i class="bi bi-telephone text-muted mt-1"></i>
+          <div>
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Phone Number</small>
+            <span class="text-dark fw-medium">{{ profile.phone || 'N/A' }}</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <i class="bi bi-envelope text-muted mt-1"></i>
+          <div>
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Email Address</small>
+            <span class="text-dark fw-medium">{{ profile.email || 'N/A' }}</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <i class="bi bi-asterisk text-muted mt-1"></i>
+          <div>
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Emergency Contact</small>
+            <span class="text-dark fw-medium">{{ profile.emergencyContactName || 'N/A' }} &bull; {{ profile.emergencyContactPhone || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Vehicle Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3 profile-card" *ngIf="profile.assignedVehicle">
+      <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+        <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+          <i class="bi bi-truck fs-6"></i> ASSIGNED VEHICLE
+        </span>
+      </div>
+      <div class="card-body pt-3 pb-3">
+        <div class="d-flex align-items-center gap-3">
+          <img [src]="profile.assignedVehicle.image || 'assets/images/vehicle-placeholder.jpg'" alt="Vehicle" class="rounded-3 object-fit-cover shadow-sm" style="width: 60px; height: 60px;" onerror="this.src='https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=150&h=150'">
+          <div>
+            <h6 class="fw-bold text-dark mb-1">{{ profile.assignedVehicle.name || 'N/A' }}</h6>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1" style="font-size: 0.65rem;">{{ profile.assignedVehicle.number || 'N/A' }}</span>
+              <span class="text-muted small" style="font-size: 0.7rem;">&bull; Last Service: {{ profile.assignedVehicle.lastServiceDate | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legal Documents Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 profile-card" *ngIf="profile.documents && profile.documents.length > 0">
+      <div class="card-header bg-white border-bottom pt-3 pb-2">
+        <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+          <i class="bi bi-file-earmark-text fs-6"></i> LEGAL DOCUMENTS
+        </span>
+      </div>
+      <div class="card-body p-0">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom cursor-pointer hover-bg-light" *ngFor="let doc of profile.documents">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-file-earmark text-muted fs-5"></i>
+            <div>
+              <span class="text-dark fw-medium d-block" style="font-size: 0.9rem;">{{ doc.name }}</span>
+              <span class="small" [ngClass]="doc.isValid ? 'text-success' : 'text-danger'" style="font-size: 0.7rem;">
+                {{ doc.isValid ? 'Valid until ' + (doc.expiryDate | date:'mediumDate') : 'Expired' }}
+              </span>
+            </div>
+          </div>
+          <i class="bi bi-chevron-right text-muted small"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column gap-2 mb-4 pb-3">
+      <button class="btn btn-primary w-100 rounded-3 py-2 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2">
+        <i class="bi bi-pencil"></i> Edit Profile
+      </button>
+      <button class="btn w-100 rounded-3 py-2 fw-bold d-flex justify-content-center align-items-center gap-2" style="background-color: rgba(110, 44, 34, 0.08); color: var(--primary-dark); border: none;">
+        <i class="bi bi-arrow-clockwise"></i> Change Password
+      </button>
+      <button class="btn w-100 rounded-3 py-2 fw-bold d-flex justify-content-center align-items-center gap-2 mt-2" style="background-color: rgba(239, 68, 68, 0.1); color: var(--danger); border: none;" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+    
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted small fw-bold">Loading profile...</p>
+  </div>
+</ng-template>

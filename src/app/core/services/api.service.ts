@@ -292,4 +292,24 @@ export class ApiService {
   punchDriverAttendance(): Observable<any> {
     return this.http.post<any>(`${this.baseApiUrl}/DriverApp/attendance/punch`, {});
   }
+
+  getDriverAttendanceHistory(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverApp/attendance/history`);
+  }
+
+  getDriverProfile(): Observable<any> {
+    return this.http.get<any>(`${this.baseApiUrl}/DriverApp/profile`);
+  }
+
+  updateDriverProfile(data: any): Observable<any> {
+    return this.http.put<any>(`${this.baseApiUrl}/DriverApp/profile`, data);
+  }
+
+  startDriverAppTrip(bookingVehicleId: number, data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverApp/trip/${bookingVehicleId}/start`, data);
+  }
+
+  endDriverAppTrip(bookingVehicleId: number, data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseApiUrl}/DriverApp/trip/${bookingVehicleId}/end`, data);
+  }
 }

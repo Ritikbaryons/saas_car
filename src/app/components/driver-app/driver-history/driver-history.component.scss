@@ -1,0 +1,77 @@
+.driver-history-container {
+  min-height: 100vh;
+  
+  .history-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    
+    .nav-tabs-container {
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .nav-tab {
+      color: #64748b;
+      position: relative;
+      transition: color 0.2s ease;
+      
+      &.active {
+        color: var(--primary-color);
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background-color: var(--primary-color);
+          border-radius: 3px 3px 0 0;
+        }
+      }
+    }
+  }
+
+  .trip-card {
+    transition: transform 0.2s ease;
+    
+    &.border-start-primary {
+      border-left: 5px solid var(--primary-color) !important;
+    }
+    
+    &.border-start-success {
+      border-left: 5px solid #16a34a !important;
+    }
+    
+    .trip-route-timeline {
+      border-color: #e2e8f0 !important;
+      
+      .trip-route-item {
+        span.bg-primary, span.bg-secondary, span.bg-success {
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color) !important;
+      border-color: var(--primary-color) !important;
+    }
+  }
+  
+  .fab-button {
+    position: fixed;
+    bottom: 90px; /* Above the bottom nav */
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    z-index: 1040;
+    background-color: var(--primary-color);
+    
+    &:hover {
+      background-color: var(--primary-dark);
+      transform: scale(1.05);
+    }
+  }
+}

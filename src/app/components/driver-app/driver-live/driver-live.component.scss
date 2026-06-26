@@ -1,0 +1,36 @@
+.driver-live-container {
+  min-height: 100vh;
+  
+  .live-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
+
+  .trip-info-card {
+    border-left: 5px solid var(--primary-color) !important;
+  }
+
+  .map-placeholder {
+    height: 160px;
+    
+    .map-overlay {
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    }
+  }
+
+  .trip-route-timeline {
+    border-color: #e2e8f0 !important;
+    
+    .trip-route-item {
+      .icon-container {
+        width: 24px;
+        height: 24px;
+        
+        i {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}

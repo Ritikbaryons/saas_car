@@ -1,0 +1,167 @@
+<div class="driver-live-container position-relative" *ngIf="currentRide; else emptyState">
+  <!-- Top Header -->
+  <div class="live-header bg-white shadow-sm border-bottom">
+    <div class="d-flex justify-content-between align-items-center px-3 py-3">
+      <i class="bi bi-arrow-left fs-5 text-primary cursor-pointer" (click)="goBack()"></i>
+      <h5 class="mb-0 fw-bold text-primary">Trip Details</h5>
+      <i class="bi bi-gear fs-5 text-secondary"></i>
+    </div>
+  </div>
+
+  <div class="live-content p-3 pb-5">
+    
+    <!-- Trip Info Card -->
+    <div class="card trip-info-card border-0 shadow-sm rounded-4 mb-3 border-start-primary">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <small class="text-muted d-block" style="font-size: 0.65rem;">Booking ID</small>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold text-dark">{{ currentRide.bookingId || 'FLT-XXXX' }}</span>
+              <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.6rem;">{{ currentRide.status | uppercase }}</span>
+            </div>
+          </div>
+          <div class="text-end">
+            <small class="text-muted d-block" style="font-size: 0.65rem;">Vehicle</small>
+            <span class="fw-bold text-primary">{{ currentRide.vehicleNumber || 'ABC-XXXX' }}</span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 pt-3 border-top">
+          <img [src]="currentRide.customerAvatar || 'assets/images/user-placeholder.jpg'" alt="Customer" class="rounded-circle" width="40" height="40" onerror="this.src='https://ui-avatars.com/api/?name=Customer&background=e2e8f0&color=475569'">
+          <div>
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Customer</small>
+            <span class="fw-bold text-dark d-block">{{ currentRide.customerName || 'N/A' }}</span>
+            <small class="text-muted">{{ currentRide.customerPhone || 'N/A' }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Placeholder -->
+    <div class="map-placeholder rounded-4 overflow-hidden mb-3 position-relative shadow-sm border border-secondary border-opacity-10">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=600&h=300" alt="Map" class="w-100 h-100 object-fit-cover bg-light" style="opacity: 0.9;">
+      <div class="position-absolute bottom-0 start-0 w-100 p-2 map-overlay">
+        <div class="d-flex align-items-center gap-2 text-white px-2">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span class="fw-bold small">Active Route: {{ currentRide.activeRouteName || 'Navigating...' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trip Timeline -->
+    <h6 class="fw-bold text-secondary mb-3 small" style="letter-spacing: 0.5px;">TRIP TIMELINE</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body p-3">
+        <div class="trip-route-timeline position-relative ps-3 border-start border-2 border-light ms-2">
+          <div class="trip-route-item mb-4 position-relative">
+            <span class="position-absolute top-0 start-0 translate-middle p-1 bg-success text-white rounded-circle d-flex align-items-center justify-content-center icon-container" style="margin-left: -1px;">
+              <i class="bi bi-check"></i>
+            </span>
+            <div class="d-flex justify-content-between align-items-start ms-3">
+              <div>
+                <span class="text-dark d-block fw-bold">Pickup</span>
+                <span class="text-muted d-block small mb-1">{{ currentRide.pickupLocation || 'N/A' }}</span>
+                <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-1" style="font-size: 0.6rem;">COMPLETED</span>
+              </div>
+            </div>
+          </div>
+          <div class="trip-route-item position-relative">
+            <span class="position-absolute top-0 start-0 translate-middle p-1 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center icon-container" style="margin-left: -1px;">
+              <i class="bi bi-cursor-fill" style="transform: rotate(45deg);"></i>
+            </span>
+            <div class="d-flex justify-content-between align-items-start ms-3">
+              <div>
+                <span class="text-dark d-block fw-bold">Drop-off</span>
+                <span class="text-muted d-block small mb-1">{{ currentRide.dropoffLocation || 'N/A' }}</span>
+                <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.6rem;">{{ currentRide.status === 'Completed' ? 'COMPLETED' : 'IN PROGRESS' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Information -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body p-3">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-info-circle text-muted"></i>
+          <span class="fw-bold text-dark small">Booking Information</span>
+        </div>
+        <div class="row g-2">
+          <div class="col-4">
+            <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
+              <small class="text-muted d-block mb-1" style="font-size: 0.65rem;">Distance</small>
+              <span class="fw-bold text-dark small">{{ currentRide.distance || '0' }} km</span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
+              <small class="text-muted d-block mb-1" style="font-size: 0.65rem;">Duration</small>
+              <span class="fw-bold text-dark small">{{ currentRide.duration || '0' }} mins</span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
+              <small class="text-muted d-block mb-1" style="font-size: 0.65rem;">Payment</small>
+              <span class="fw-bold text-dark small">{{ currentRide.paymentMethod || 'Account' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special Instructions -->
+    <div class="alert bg-danger bg-opacity-10 border-0 rounded-4 mb-4 d-flex align-items-start gap-3" *ngIf="currentRide.specialInstructions">
+      <i class="bi bi-exclamation-triangle-fill text-danger fs-5 mt-1"></i>
+      <div>
+        <span class="fw-bold text-danger d-block mb-1 small">Special Instructions</span>
+        <span class="text-muted small fst-italic">"{{ currentRide.specialInstructions }}"</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <button class="btn btn-primary w-100 rounded-3 py-3 fw-bold mb-2 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background-color: var(--primary-color); border-color: var(--primary-color);">
+      <i class="bi bi-map"></i> Navigate
+    </button>
+    <div class="row g-2">
+      <div class="col-6">
+        <button class="btn btn-light border w-100 rounded-3 py-2 small text-secondary d-flex align-items-center justify-content-center gap-2" (click)="startRide()" [disabled]="currentRide.status === 'In Progress' || currentRide.status === 'Completed'">
+          <i class="bi bi-person-walking"></i> {{ currentRide.status === 'In Progress' || currentRide.status === 'Completed' ? 'Trip Started' : 'Arrived at Pickup' }}
+        </button>
+      </div>
+      <div class="col-6">
+        <button class="btn btn-outline-primary w-100 rounded-3 py-2 small d-flex align-items-center justify-content-center gap-2" (click)="endRide()" [disabled]="currentRide.status === 'Completed'">
+          <i class="bi bi-check-circle"></i> Complete Trip
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #emptyState>
+  <div class="driver-live-container position-relative bg-light">
+    <div class="live-header bg-white shadow-sm border-bottom">
+      <div class="d-flex justify-content-between align-items-center px-3 py-3">
+        <i class="bi bi-arrow-left fs-5 text-primary cursor-pointer" (click)="goBack()"></i>
+        <h5 class="mb-0 fw-bold text-primary">Trip Details</h5>
+        <i class="bi bi-gear fs-5 text-secondary"></i>
+      </div>
+    </div>
+    
+    <div *ngIf="loading" class="d-flex flex-column justify-content-center align-items-center mt-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted small fw-bold">Loading trip...</p>
+    </div>
+
+    <div *ngIf="!loading" class="d-flex flex-column justify-content-center align-items-center p-5 text-center mt-5">
+      <i class="bi bi-car-front text-muted" style="font-size: 3rem;"></i>
+      <h5 class="fw-bold mt-3">No Active Trip</h5>
+      <p class="text-muted small">You don't have any ongoing or assigned trips to view details for right now.</p>
+      <button class="btn btn-primary rounded-pill px-4 mt-2" (click)="goBack()">Go Back</button>
+    </div>
+  </div>
+</ng-template>

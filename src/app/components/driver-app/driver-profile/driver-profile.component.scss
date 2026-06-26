@@ -1,0 +1,26 @@
+.driver-profile-container {
+  min-height: 100vh;
+  
+  .profile-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: transparent;
+  }
+
+  .profile-card {
+    transition: transform 0.2s ease;
+    
+    .card-header {
+      background-color: #ffffff;
+    }
+    
+    .hover-bg-light:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+}

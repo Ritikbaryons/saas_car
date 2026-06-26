@@ -1,0 +1,145 @@
+<div class="driver-home-container" *ngIf="data; else loading">
+  <!-- Top Header -->
+  <div class="home-header d-flex justify-content-between align-items-center bg-white px-3 py-3 border-bottom shadow-sm">
+    <div class="d-flex align-items-center gap-2">
+      <img [src]="data.driverAvatar || 'assets/images/user-placeholder.jpg'" alt="User" class="rounded-circle border border-2 border-primary" width="36" height="36" onerror="this.src='https://ui-avatars.com/api/?name=Driver&background=6e2c22&color=fff'">
+      <h5 class="mb-0 fw-bold text-primary ms-1">{{ data.companyName || 'FleetSync' }}</h5>
+    </div>
+    <i class="bi bi-gear fs-5 text-secondary"></i>
+  </div>
+
+  <div class="home-content p-3">
+    <!-- Driver Info Card -->
+    <div class="card driver-info-card border border-primary border-opacity-25 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="fw-bold mb-0 text-dark">{{ data.driverName || 'N/A' }}</h5>
+            <small class="text-muted" style="font-size: 0.75rem;">{{ data.employeeId || 'EMP-XXXX' }}</small>
+          </div>
+          <span class="badge bg-opacity-25 rounded-pill px-2 py-1 d-flex align-items-center gap-1"
+                [ngClass]="data.isOnDuty ? 'bg-success text-success' : 'bg-secondary text-secondary'">
+            <span class="status-dot rounded-circle d-inline-block"
+                  [ngClass]="data.isOnDuty ? 'bg-success' : 'bg-secondary'"></span> 
+            {{ data.isOnDuty ? 'On Duty' : 'Off Duty' }}
+          </span>
+        </div>
+        <div class="vehicle-badge bg-light text-dark px-3 py-2 rounded-3 mt-3 d-inline-flex align-items-center gap-2 small fw-bold w-100">
+          <i class="bi bi-car-front text-primary"></i> {{ data.assignedVehicleNumber || 'No Vehicle Assigned' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Summary -->
+    <h6 class="fw-bold text-secondary mb-3 small section-title">Today's Summary</h6>
+    <div class="row g-2 mb-4">
+      <div class="col-6">
+        <div class="summary-card card border-0 shadow-sm rounded-3 h-100 p-3 text-center">
+          <h2 class="text-primary mb-1 fw-bold">{{ data.summary?.totalTrips || 0 }}</h2>
+          <small class="text-muted">Total Trips</small>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="summary-card card border-0 shadow-sm rounded-3 h-100 p-3 text-center">
+          <h2 class="text-success mb-1 fw-bold">{{ data.summary?.completedTrips || 0 }}</h2>
+          <small class="text-muted">Completed</small>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="summary-card card border-0 shadow-sm rounded-3 h-100 p-3 text-center">
+          <h2 class="text-dark mb-1 fw-bold">{{ data.summary?.kmCovered || 0 }}</h2>
+          <small class="text-muted">km Covered</small>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="summary-card card border-0 shadow-sm rounded-3 h-100 p-3 text-center">
+          <h2 class="text-dark mb-1 fw-bold">{{ data.summary?.hoursLogged || 0 }}</h2>
+          <small class="text-muted">Hours Logged</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <h6 class="fw-bold text-secondary mb-3 small section-title">Quick Actions</h6>
+    <div class="row g-2 mb-4">
+      <div class="col-6">
+        <div class="action-btn card border-0 shadow-sm rounded-3 h-100 p-3 text-center bg-primary text-white cursor-pointer" routerLink="/driver/attendance">
+          <i class="bi bi-calendar-check fs-4 mb-2 d-block"></i>
+          <span class="small fw-bold">Mark Attendance</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="action-btn card border-0 shadow-sm rounded-3 h-100 p-3 text-center bg-light text-secondary cursor-pointer">
+          <i class="bi bi-stop-circle fs-4 mb-2 d-block"></i>
+          <span class="small fw-bold">End Duty</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="action-btn card border border-light shadow-sm rounded-3 h-100 p-3 text-center bg-white text-secondary cursor-pointer">
+          <i class="bi bi-clipboard-check text-dark fs-4 mb-2 d-block"></i>
+          <span class="small fw-bold text-dark">Inspection</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="action-btn card border border-light shadow-sm rounded-3 h-100 p-3 text-center bg-white text-secondary cursor-pointer">
+          <i class="bi bi-exclamation-triangle text-danger fs-4 mb-2 d-block"></i>
+          <span class="small fw-bold text-dark">Report Issue</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Trip -->
+    <h6 class="fw-bold text-secondary mb-3 small section-title" *ngIf="data.upcomingTrip">Upcoming Trip</h6>
+    <div class="card border-0 shadow-sm rounded-4 upcoming-trip-card mb-3" *ngIf="data.upcomingTrip">
+      <div class="card-header bg-light bg-opacity-50 border-bottom-0 pt-3 pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+        <span class="text-primary small fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+          <span class="status-dot bg-primary rounded-circle d-inline-block"></span> NEXT BOOKING
+        </span>
+        <span class="fs-5 fw-bold text-dark">{{ data.upcomingTrip?.time | date:'shortTime' }}</span>
+      </div>
+      <div class="card-body pt-2 pb-3 px-3">
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+            <i class="bi bi-person"></i>
+          </div>
+          <div>
+            <small class="text-muted d-block">Customer</small>
+            <h6 class="fw-bold text-dark mb-0 fs-5">{{ data.upcomingTrip?.customerName || 'N/A' }}</h6>
+          </div>
+        </div>
+        
+        <div class="d-flex align-items-start gap-2 mb-4">
+          <div class="d-flex flex-column align-items-center mt-1">
+            <i class="bi bi-geo-alt-fill text-primary small"></i>
+            <div class="vertical-line bg-light flex-grow-1" style="width: 2px; min-height: 20px;"></div>
+          </div>
+          <div>
+            <small class="text-muted d-block">Pickup</small>
+            <span class="text-dark d-block">{{ data.upcomingTrip?.pickupLocation || 'N/A' }}</span>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary w-100 rounded-3 py-2 fw-bold d-flex justify-content-center align-items-center gap-2">
+          <i class="bi bi-sign-turn-right"></i> Accept & Start Route
+        </button>
+      </div>
+    </div>
+
+    <!-- No Trip Placeholder -->
+    <div class="card border-0 shadow-sm rounded-4 mb-3 text-center p-4 bg-light" *ngIf="!data.upcomingTrip">
+      <i class="bi bi-calendar2-x text-muted mb-2" style="font-size: 2rem;"></i>
+      <h6 class="fw-bold text-dark mb-1">No Upcoming Trips</h6>
+      <p class="text-muted small mb-0">You currently don't have any pending assignments.</p>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted small fw-bold">Loading dashboard...</p>
+  </div>
+</ng-template>
