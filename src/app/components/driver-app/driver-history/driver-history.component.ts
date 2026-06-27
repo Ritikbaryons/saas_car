@@ -39,6 +39,7 @@ export class DriverHistoryComponent implements OnInit {
         return t.date && t.date.startsWith(todayStr);
       }
       if (this.activeTab === 'Upcoming') return t.status === 'Upcoming' || t.status === 'Assigned';
+      if (this.activeTab === 'Live') return t.status === 'InProgress' || t.status === 'Active';
       if (this.activeTab === 'Completed') return t.status === 'Completed';
       if (this.activeTab === 'Cancelled') return t.status === 'Cancelled';
       return true;

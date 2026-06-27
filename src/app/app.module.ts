@@ -6,6 +6,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { ApiInterceptor } from './core/interceptors/api.interceptor';
 
 // Flow Module Components
 import { LoginComponent } from './components/login/login.component';
@@ -34,6 +35,7 @@ import { DriverLiveComponent } from './components/driver-app/driver-live/driver-
 import { DriverHistoryComponent } from './components/driver-app/driver-history/driver-history.component';
 import { DriverAttendanceComponent } from './components/driver-app/driver-attendance/driver-attendance.component';
 import { DriverProfileComponent } from './components/driver-app/driver-profile/driver-profile.component';
+import { DriverAlertsComponent } from './components/driver-app/driver-alerts/driver-alerts.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +63,8 @@ import { DriverProfileComponent } from './components/driver-app/driver-profile/d
     DriverLiveComponent,
     DriverHistoryComponent,
     DriverAttendanceComponent,
-    DriverProfileComponent
+    DriverProfileComponent,
+    DriverAlertsComponent
   ],
   imports: [
     BrowserModule,
@@ -73,7 +76,8 @@ import { DriverProfileComponent } from './components/driver-app/driver-profile/d
     PreviewbillComponent
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

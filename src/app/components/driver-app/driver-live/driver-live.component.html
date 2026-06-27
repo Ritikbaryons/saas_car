@@ -23,7 +23,7 @@
           </div>
           <div class="text-end">
             <small class="text-muted d-block" style="font-size: 0.65rem;">Vehicle</small>
-            <span class="fw-bold text-primary">{{ currentRide.vehicleNumber || 'ABC-XXXX' }}</span>
+            <span class="fw-bold text-primary">{{ currentRide.carDetails || 'ABC-XXXX' }}</span>
           </div>
         </div>
 
@@ -39,8 +39,9 @@
     </div>
 
     <!-- Map Placeholder -->
-    <div class="map-placeholder rounded-4 overflow-hidden mb-3 position-relative shadow-sm border border-secondary border-opacity-10">
-      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=600&h=300" alt="Map" class="w-100 h-100 object-fit-cover bg-light" style="opacity: 0.9;">
+    <div class="map-placeholder rounded-4 overflow-hidden mb-3 position-relative shadow-sm border border-secondary border-opacity-10" style="height: 300px;">
+      <iframe *ngIf="mapUrl" [src]="mapUrl" class="w-100 h-100 border-0" style="pointer-events: none;"></iframe>
+      <img *ngIf="!mapUrl" src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=600&h=300" alt="Map" class="w-100 h-100 object-fit-cover bg-light" style="opacity: 0.9;">
       <div class="position-absolute bottom-0 start-0 w-100 p-2 map-overlay">
         <div class="d-flex align-items-center gap-2 text-white px-2">
           <i class="bi bi-geo-alt-fill"></i>
@@ -61,7 +62,7 @@
             <div class="d-flex justify-content-between align-items-start ms-3">
               <div>
                 <span class="text-dark d-block fw-bold">Pickup</span>
-                <span class="text-muted d-block small mb-1">{{ currentRide.pickupLocation || 'N/A' }}</span>
+                <span class="text-muted d-block small mb-1">{{ currentRide.pickup || 'N/A' }}</span>
                 <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-1" style="font-size: 0.6rem;">COMPLETED</span>
               </div>
             </div>
@@ -73,8 +74,8 @@
             <div class="d-flex justify-content-between align-items-start ms-3">
               <div>
                 <span class="text-dark d-block fw-bold">Drop-off</span>
-                <span class="text-muted d-block small mb-1">{{ currentRide.dropoffLocation || 'N/A' }}</span>
-                <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.6rem;">{{ currentRide.status === 'Completed' ? 'COMPLETED' : 'IN PROGRESS' }}</span>
+                <span class="text-muted d-block small mb-1">{{ currentRide.drop || 'N/A' }}</span>
+                <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.6rem;">{{ currentRide.status === 'Assigned' ? 'NOT STARTED' : (currentRide.status | uppercase) }}</span>
               </div>
             </div>
           </div>
@@ -125,18 +126,14 @@
     <button class="btn btn-primary w-100 rounded-3 py-3 fw-bold mb-2 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background-color: var(--primary-color); border-color: var(--primary-color);">
       <i class="bi bi-map"></i> Navigate
     </button>
-    <div class="row g-2">
-      <div class="col-6">
-        <button class="btn btn-light border w-100 rounded-3 py-2 small text-secondary d-flex align-items-center justify-content-center gap-2" (click)="startRide()" [disabled]="currentRide.status === 'In Progress' || currentRide.status === 'Completed'">
-          <i class="bi bi-person-walking"></i> {{ currentRide.status === 'In Progress' || currentRide.status === 'Completed' ? 'Trip Started' : 'Arrived at Pickup' }}
-        </button>
-      </div>
-      <div class="col-6">
-        <button class="btn btn-outline-primary w-100 rounded-3 py-2 small d-flex align-items-center justify-content-center gap-2" (click)="endRide()" [disabled]="currentRide.status === 'Completed'">
-          <i class="bi bi-check-circle"></i> Complete Trip
-        </button>
-      </div>
-    </div>
+    <!-- Single Dynamic Action Button -->
+    <button class="btn w-100 rounded-3 py-3 fw-bold mb-2 shadow-sm d-flex align-items-center justify-content-center gap-2" 
+            [ngClass]="currentRide.status === 'Assigned' ? 'btn-primary' : (currentRide.status === 'InProgress' || currentRide.status === 'Active' ? 'btn-danger text-white' : 'btn-success text-white')"
+            (click)="currentRide.status === 'Assigned' ? startRide() : endRide()" 
+            [disabled]="currentRide.status === 'Completed'">
+      <i class="bi" [ngClass]="currentRide.status === 'Assigned' ? 'bi-person-walking' : 'bi-check-circle'"></i> 
+      {{ currentRide.status === 'Assigned' ? 'Accept / Start Trip' : (currentRide.status === 'InProgress' || currentRide.status === 'Active' ? 'Complete Trip' : 'Trip Completed') }}
+    </button>
   </div>
 </div>
 

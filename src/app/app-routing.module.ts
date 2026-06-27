@@ -29,6 +29,7 @@ import { DriverHistoryComponent } from './components/driver-app/driver-history/d
 import { DriverAttendanceComponent } from './components/driver-app/driver-attendance/driver-attendance.component';
 
 import { DriverProfileComponent } from './components/driver-app/driver-profile/driver-profile.component';
+import { DriverAlertsComponent } from './components/driver-app/driver-alerts/driver-alerts.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -43,6 +44,7 @@ const routes: Routes = [
       { path: 'live', component: DriverLiveComponent },
       { path: 'history', component: DriverHistoryComponent },
       { path: 'profile', component: DriverProfileComponent },
+      { path: 'alerts', component: DriverAlertsComponent },
       { path: 'attendance', component: DriverAttendanceComponent },
       { path: 'manage/:token', component: DriverPortalComponent },
       { path: '', redirectTo: 'home', pathMatch: 'full' }

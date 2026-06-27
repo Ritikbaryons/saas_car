@@ -11,6 +11,9 @@
     
     <!-- Tabs -->
     <div class="d-flex justify-content-between px-3 mt-1 text-center nav-tabs-container">
+      <div class="nav-tab py-2 px-1 cursor-pointer" [class.active]="activeTab === 'Live'" (click)="setTab('Live')">
+        <small class="fw-bold text-success">Live</small>
+      </div>
       <div class="nav-tab py-2 px-1 cursor-pointer" [class.active]="activeTab === 'Today'" (click)="setTab('Today')">
         <small class="fw-bold">Today</small>
       </div>
